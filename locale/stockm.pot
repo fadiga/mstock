@@ -1,0 +1,170 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR yɛlɛman s.à.r.l
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: stockm 0.1\n"
+"Report-Msgid-Bugs-To: bugs@yeleman.com\n"
+"POT-Creation-Date: 2013-07-27 21:17+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:21
+#, python-format
+msgid "Facture N°: (%(number)s)"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:30
+msgid "Quantity"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:31
+#: /media/truecrypt1/works/mgestion/stockm/ui/invoice_show.py:94
+msgid "Désignation"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:32
+#: /media/truecrypt1/works/mgestion/stockm/ui/invoice_show.py:94
+msgid "Prix Unitaire"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:33
+msgid "Balance"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:63
+msgid "TOTALS"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:79
+#, python-format
+msgid "The list of operations for the period %s."
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:98
+#, python-format
+msgid "%(name)s (%(number)s)"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:108
+msgid "Order No."
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:109
+msgid "Invoice No."
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:110
+msgid "Invoice date"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:111
+msgid "Provider"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:112
+msgid "Amount"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm//prints.py:149
+msgid "It has no operations for this period."
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:23
+msgid "Periodic report"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:27
+msgid "OK"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:32
+msgid "On date"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:34
+msgid "End date"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:40
+msgid "Reports of "
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:41
+msgid " to "
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:64
+msgid "Product"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:64
+msgid "Store"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:64
+msgid "Type"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:65
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_store.py:52
+msgid "Date"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_period.py:65
+msgid "Remaining"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_store.py:27
+#, python-format
+msgid "Les rapports de stock pour: %s"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_store.py:52
+msgid "Produit"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/by_store.py:52
+msgid "Restant"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/dashboard.py:40
+msgid "TABLEAU DE BORD"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/dashboard.py:42
+msgid "Les alertes "
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/dashboard.py:47
+msgid "Les stocks actual"
+msgstr ""
+
+#. self.table_statis = F_BoxTitle(_(u"Les Statistiques"))
+#. self.table_statis = StatisTableWidget(parent=self)
+#. table_statis.addWidget(self.table_statis)
+#. table_statis.addWidget(self.table_statis)
+#: /media/truecrypt1/works/mgestion/stockm/ui/dashboard.py:58
+msgid "Alertes sur les products "
+msgstr ""
+
+#. (table_statis, _(u"Statistique")),
+#: /media/truecrypt1/works/mgestion/stockm/ui/dashboard.py:60
+msgid "Les Factures"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/invoice_show.py:94
+msgid "Quantité"
+msgstr ""
+
+#: /media/truecrypt1/works/mgestion/stockm/ui/invoice_show.py:95
+msgid "Montant"
+msgstr ""

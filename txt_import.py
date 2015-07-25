@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import sqlite3
+
+sys.path.append(os.path.abspath('../'))
+from models import Product, Category
+
+
+pr = [[None, u"ROULEMENT 6300"],
+[None, u"ROULEMENT 6301"],
+[None, u"ROULEMENT 6302"],
+[None, u"ROULEMENT 6202"],
+[None, u"ROULEMENT 6203"],
+[None, u"ROULEMENT 6303"],
+[None, u"ROULEMENT 6004"],
+[None, u"ROULEMENT 6204"],
+[None, u"ROULEMENT 6205"],
+[None, u"ROULEMENT 6304"],
+[None, u"ROULEMENT 6206"],
+[None, u"ROULEMENT 63/28"],
+[None, u"VOILANT COMPLET CD110"],
+[None, u"VOILANT COMPLE DX100"],
+[None, u"VOILANT COMPLE GN125"],
+[None, u"VOILANT COMPLE CG125"],
+[None, u"BOUGIES C7HNS"],
+[None, u"BOUGIES BP7HNS"],
+[None, u"BOUGIES D8ENS"],
+[None, u"BOUGIES BCP7ENT"],
+[None, u"BOUGIES BP6ENS"],
+[None, u"BOUGIES BCP6NS"],
+[None, u"BOUGIES BP6EJ"],
+[None, u"CYLINDRE V50"],
+[None, u"CYLINDRE V80"],
+[None, u"CYLINDRE DX100"],
+[None, u"CYLINDRE CD110"],
+[None, u"CYLINDRE CG125"],
+[None, u"CYLINDRE CG150"],
+[None, u"DISQUE D'AMBRAGE V80"],
+[None, u"DISQUE D'AMBRAGE DX100"],
+[None, u"DISQUE D'AMBRAGE CG125"],
+[None, u"PAIRE AMORTUSEUR V80 AR"],
+[None, u"PAIRE AMORTUSEUR V80 AV"],
+[None, u"PAIRE AMORTUSEUR CG125 AR"],
+[None, u"PAIRE AMORTUSEUR CD110 AR"],
+[None, u"CHAINE 420 106L"],
+[None, u"CHAINE 428 116L"],
+[None, u"CHAINE 428 130L"],
+[None, u"VILBREQUAINS COMPLETS CD110"],
+[None, u"VILBREQUAINS COMPLETS DX100"],
+[None, u"VILBREQUAINS COMPLETS CG125 ELECTRONIC"],
+[None, u"VILBREQUAINS COMPLETS CG125 ANCIEN"],
+[None, u"VILBREQUAINS V80"],
+[None, u"VILBREQUAINS V50"],
+[None, u"MAYAUX CG125 AR"],
+[None, u"MAYAUX DX100/V80 AR"],
+[None, u"BATTERIERS 12N5-3B"],
+[None, u"BATTERIERS YB6L-B"],
+[None, u"BATTERIERS YB2.5L-C"],
+[None, u"BATTERIERS 6N4-2A"],
+[None, u"BATTERIERS 12N9-4B-1"],
+[None, u"BOLES D'AMBRAGE V80"],
+[None, u"BOLES D'AMBRAGE V50"],
+[None, u"BOLES D'AMBRAGE DX100"],
+[None, u"BOLES D'AMBRAGE CD110"],
+[None, u"BOLES D'AMBRAGE CG125 COMPLET"],
+[None, u"CARBURATEUR V80/V50"],
+[None, u"CARBURATEUR DX100"],
+[None, u"CARBURATEUR CG125"],
+[None, u"CARBURATEUR CD110"],
+[None, u"FEURADEAUXS CG125"],
+[None, u"FEURADEAUXS DX100"],
+[None, u"FEURADEAUXS DT125"],
+[None, u"POLIS COMPLET CD110"],
+[None, u"CYLINDRE CG125 PETIT"],
+[u"HD011-C01",u"ARBRE A CAME CG125"],
+[u"HD012-C01",u"ARBRE A CAME CD110"],
+[u"HD012 C141+C591",u"NECESSEUR BOLE CD110"],
+[u"YM002-C13+C14",u"NECESSEUR BOLE DX100"],
+[u"HD011-C87",u"NECESSEUR BOLE CG125"],
+[None, u"SEGMENT CG125 STD+"],
+[None, u"SEGMENT CG125 025"],
+[None, u"SEGMENT DX100 STD+"],
+[None, u"SEGMENT CD110 STD+"],
+[None, u"SEGMENT CD110 025"],
+[None, u"SEGMENT CG150 STD+"],
+[None, u"PISTON V50 STD+"],
+[None, u"PISTON V80 STD+"],
+[None, u"PISTON CD110 STD+"],
+[None, u"PISTON DX100 STD+"],
+[None, u"PISTON CG125 STD+"],
+[None, u"PISTON CG150 STD+"],
+[u"HD011-R08",u"PETIT CLYBUTEUR CG125"],
+[u"HD012-A20",u"PETIT CLYBUTEUR CD110"],
+[u"HD011-R09",u"GROOS CLYBUTEUR"],
+[u"HD012-S85",u"CHAINE MOTEUR COMPLET CD11O"],
+[u"HD012-S85",u"CHAINE MOTEUR CD110"],
+[u"HD012-S39",u"CHAINE MOTEUR SIMPLE CD110"],
+[u"HD011-C272",u"DJODE CDI CG125"],
+[u"HD011-E01",u"PAIRE SOUPAPE CG125"],
+[u"HD012-E01",u"PAIRE SOUPAPE CD110"],
+[u"YM002-G04",u"PIONS VILBREQUAIN DX100"],
+[u"YM005-G36",u"PIONS VILBREQUAIN V80 "],
+[None, u"JOINTS DE FUITE V8O"],
+[None, u"JOINTS DE FUITE DX100"],
+[None, u"JOINTS DE FUITE CD110"],
+[None, u"JOINTS COMPLETS V80"],
+[None, u"JOINTS COMPLETS DX100"],
+[None, u"JOINTS COMPLETS CD110"],
+[None, u"JOINTS COMPLETS 190D"],
+[None, u"JOINTS DE CULASSE 190D "],
+[u"HD012 C81/S",u"GARNATEUR SIMPLET CD110"],
+[None, u"SELECTEUR DX100"],
+[None, u"SELECTEUR CD110"],
+[None, u"CYLINDRE CG125 GROOS"],
+[None, u"CYLINDRE CG200"]]
+
+ok = True
+
+for pcode, pname in pr:
+    p = Product()
+    p.code = pcode
+    p.name = pname
+    p.category = Category.get_or_create(name="moto")
+    try:
+        print("Saving {} ".format(p.name))
+        p.save()
+        print("ok")
+    except Exception as e:
+        print("no save {}".format(e))
