@@ -23,7 +23,7 @@ class StockOutputWidget(FWidget):
 
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(StockOutputWidget, self).__init__(parent=parent, *args, **kwargs)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      SORTIE ")
+        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      SORTIE STOCK ")
         self.parent = parent
 
         vbox = QVBoxLayout(self)
@@ -271,8 +271,8 @@ class InproductTableWidget(FTableWidget):
 
         self.stretch_columns = [0, 1]
         self.align_map = {1: "l", 2: "l"}
-        self.ecart = 144
-        self.display_vheaders = False
+        # self.ecart = 144
+        # self.display_vheaders = False
         self.display_fixed = True
         self.refresh_()
 
@@ -308,17 +308,15 @@ class InproductTableWidget(FTableWidget):
         nb_rows = self.rowCount()
 
         self.setRowCount(nb_rows + 1)
-        self.setSpan(nb_rows, 0, 1, 1)
         bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
                                                       img='save.png')))
         self.button = QPushButton(bicon, u"Enrgistrer la sortie")
         self.button.released.connect(self.parent.save_report)
-        # self.button.setStyleSheet("background-color: #F27878")
         self.setCellWidget(nb_rows, 1, self.button)
 
-        pw = (self.parentWidget().width()) / 3
-        self.setColumnWidth(0, pw)
-        self.setColumnWidth(1, (pw * 2) - 2)
+        # pw = (self.parentWidget().width()) / 3
+        # self.setColumnWidth(0, pw)
+        # self.setColumnWidth(1, (pw * 2) - 2)
 
     def _item_for_data(self, row, column, data, context=None):
         if column != 1 and column != 3:

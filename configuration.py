@@ -39,9 +39,6 @@ class Config(Constants):
     DEBUG = False
 
     # # ------------------------- Organisation --------------------------#
-    # NAME_MAIN = "mmain.py"
-    # APP_NAME = u"G.mag"
-    # APP_DATE = u"12/2012"
 
     # NAME_ORGA = u"BOUTIQUE ULTIMO"
     # CONTACT_ORGA = u"Bamako-Rep. du Mali"

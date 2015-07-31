@@ -39,7 +39,9 @@ def pdFview(filename, invoice):
 
     # setup the empty canvas
     from io import FileIO as file
-    from Common.pyPdf import PdfFileWriter, PdfFileReader
+    # from Common.pyPdf import PdfFileWriter, PdfFileReader
+    from PyPDF2 import PdfFileWriter, PdfFileReader
+
     # PDF en entrée
     input1 = PdfFileReader(file(PDFSOURCE, "rb"))
 

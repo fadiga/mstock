@@ -19,7 +19,7 @@ class StateStockViewWidget(FWidget, FPeriodHolder):
         super(StateStockViewWidget, self).__init__(parent=parent, *args, **kwargs)
         FPeriodHolder.__init__(self, *args, **kwargs)
 
-        self.title = u"Les Activités"
+        self.title = u"     Les Activités"
         self.parentWidget().setWindowTitle(Config.NAME_ORGA + self.title)
         self.parent = parent
 

@@ -69,7 +69,7 @@ class ShowInvoiceViewWidget(FWidget):
         write_invoice_xls("invoice.xls", self.invoice)
 
     def printer_pdf(self):
-        pdFreport = pdFview("invoice.pdf", self.invoice)
+        pdFreport = pdFview("invoice", self.invoice)
         uopen_file(pdFreport)
 
     def annulation(self):

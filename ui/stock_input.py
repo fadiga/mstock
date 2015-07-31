@@ -22,7 +22,7 @@ class StockInputWidget(FWidget):
 
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
-        title = u"   Rapports d'entrée dans le magasin"
+        title = u"   ENTREE STOCK"
         self.parentWidget().setWindowTitle(Config.NAME_ORGA +
                                            title)
         Config.logging.info(title)
@@ -319,15 +319,16 @@ class InputTableWidget(FTableWidget):
         nb_rows = self.rowCount()
 
         self.setRowCount(nb_rows + 1)
-        self.setSpan(nb_rows, 0, 1, 1)
-
-        self.button = Button_save(u"Enrgistrer l'entrée")
+        # self.setSpan(nb_rows, 0, 1, 1)
+        bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
+                                                      img='save.png')))
+        self.button = QPushButton(bicon, u"Enrgistrer l'entrée")
         self.button.released.connect(self.parent.save_b)
         self.setCellWidget(nb_rows, 1, self.button)
 
-        pw = (self.parentWidget().width()) / 3
-        self.setColumnWidth(0, pw)
-        self.setColumnWidth(1, (pw * 2) - 2)
+        # pw = (self.parentWidget().width()) / 3
+        # self.setColumnWidth(0, pw)
+        # self.setColumnWidth(1, (pw * 2) - 2)
 
     def _item_for_data(self, row, column, data, context=None):
         if column != 1 and column != 3:

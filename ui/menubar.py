@@ -7,7 +7,7 @@ from PyQt4.QtCore import SIGNAL, SLOT
 
 from configuration import Config
 from Common.ui.common import FWidget
-from Common.ui.login import LoginWidget
+# from Common.ui.login import LoginWidget
 from Common.exports import export_database_as_file
 
 from GCommon.ui.stores import StoresViewWidget

@@ -145,31 +145,26 @@ class InvoiceTableWidget(FTableWidget):
         self.set_data_for(value)
         self.refresh()
 
-        # pw = self.parent.parent.page_width() / 5
-        # self.setColumnWidth(0, pw)
-        # self.setColumnWidth(1, pw)
-        # self.setColumnWidth(2, pw)
-        # self.setColumnWidth(3, pw)
+        pw = self.parent.parent.page_width() / 5
+        self.setColumnWidth(0, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, pw)
+        self.setColumnWidth(3, pw)
 
     def set_data_for(self, value):
-        if not value:
-            orders = Invoice.select()
-        else:
-            qs = (Invoice.number.contains(value) |
-                  Invoice.location.contains(value) |
-                  # orders.date.contains(value) |
-                  Invoice.client.contains(value))
+
+        if value:
             try:
-                qs = qs | (Invoice.number.contains(int(value)))
-            except:
-                pass
-            try:
-                orders = orders.filter(qs)
+                invoices = Invoice.select().where(Invoice.number==int(value))
             except Exception as e:
                 Config.logging.error(e)
-                pass
+                invoices = Invoice.select().where(Invoice.location.contains(value) |
+                               Invoice.client.contains(value))
+        else:
+            invoices = Invoice.select().order_by(Invoice.number.asc())
+
         self.data = [(invoice.owner, invoice.number, show_date(invoice.date),
-                      invoice.client, "") for invoice in orders.select()]
+                      invoice.client, "") for invoice in invoices]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == self.data[0].__len__() - 1:

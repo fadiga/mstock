@@ -5,6 +5,7 @@
 from PyQt4 import QtGui
 
 from models import Owner
+from configuration import Config
 
 
 CONTACTS =  u"<b>Tel:</b> (223)76 43 38 90\n" + \
@@ -18,13 +19,11 @@ class GStatusBar(QtGui.QStatusBar):
 
         QtGui.QStatusBar.__init__(self, parent)
 
-        self.showMessage(u"Bienvenue!" + u" Dans GE.DOUG      " +
-                         u"un outil rapide et facile à utiliser"
-                         u"qui vous permet de faire le suivi de stock"  , 14000)
+        self.showMessage(u"""Bienvenue! dans {nameApp} un outil rapide et facile à utiliser qui vous permet de faire le suivi de stock""".format(nameApp=Config.APP_NAME),
+                         14000)
 
         self.setWindowOpacity(1.78)
         self.startTimer(10000)
-        # self.timerEvent()
 
     def timerEvent(self, event):
         try:

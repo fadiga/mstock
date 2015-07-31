@@ -6,12 +6,12 @@
 
   !define MUI_PRODUCT "MStock"
   !define MUI_FILE "mmain"
-  !define MUI_VERSION "Ver. 1.0"
+  !define MUI_VERSION "Ver. 3.0.0"
   !define MUI_BRANDINGTEXT "${MUI_PRODUCT} ${MUI_VERSION}"
   !define IMAGES "images"
   !define CIMAGES "cimages"
   !define MEDIA "static"
-  !define CIMAGES_PATH "C:\Users\fadiga\Documents\works\Common\${CIMAGES}"
+  !define CIMAGES_PATH "C:\Users\fadiga\Documents\GitHub\Common\${CIMAGES}"
   ;CRCCheck On
 
   !include "${NSISDIR}\Contrib\Modern UI\System.nsh"

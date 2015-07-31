@@ -38,7 +38,7 @@ def main():
 
 if __name__ == '__main__':
     if Config.DEBUG:
-        print("DEBUG")
+        print("Debug is True")
         john_doe()
         main()
     elif not SettingsAdmin().get(SettingsAdmin.id == 1).can_use:
