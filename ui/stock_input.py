@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-#maintainer: Fad
+# maintainer: Fad
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
@@ -10,12 +10,13 @@ from PyQt4.QtCore import QDate, Qt, QVariant
 from configuration import Config
 from models import (Store, Product, Reports)
 
-from Common import notification
 from Common.ui.common import (FWidget, IntLineEdit, FormLabel, FormatDate,
                               Button_menu, Button, Button_save)
 from Common.ui.util import raise_error, is_int, date_to_datetime
 from Common.ui.table import FTableWidget
+
 from ui.reports_managers import GReportViewWidget
+from ui._detail_product import InfoTableWidget
 
 
 class StockInputWidget(FWidget):
@@ -32,11 +33,9 @@ class StockInputWidget(FWidget):
         hbox = QHBoxLayout(self)
         editbox = QGridLayout()
 
-        # vbox.addWidget(FPageTitle(u"Entrée"))
-
         self.date = FormatDate(QDate.currentDate())
 
-        #Combobox widget for add store
+        # Combobox widget for add store
         self.liste_store = Store.all()
 
         self.box_mag = QComboBox()
@@ -46,15 +45,12 @@ class StockInputWidget(FWidget):
             self.box_mag.addItem(sentence, op.id)
 
         self.search_field = QLineEdit()
-        self.search_field.setToolTip("Rechercher un produit")
+        self.search_field.setPlaceholderText("Rechercher un article")
         self.search_field.setMaximumSize(200,
                                          self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
-        self.add_prod = Button(u"Nouveau produit")
-        self.add_prod.setIcon(QIcon.fromTheme('document-new',
-                                              QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img='product_add.png'))))
+        self.add_prod = Button(u"+ &Article")
         self.add_prod.clicked.connect(self.add_product)
 
         self.vline = QFrame()
@@ -66,8 +62,7 @@ class StockInputWidget(FWidget):
         self.table_in = InputTableWidget(parent=self)
 
         self.table_resultat.refresh_()
-        editbox.addWidget(FormLabel(u"Recherche:"), 0, 0)
-        editbox.addWidget(self.search_field, 0, 1)
+        editbox.addWidget(self.search_field, 0, 0)
 
         editbox.addWidget(self.vline, 0, 2, 1, 1)
 
@@ -126,7 +121,7 @@ class StockInputWidget(FWidget):
 
         for ligne in values_t:
             qty, name = ligne
-            product = Product.select().where(Product.name==name).get()
+            product = Product.select().where(Product.name == name).get()
 
             rep = Reports(orders=None, type_=Reports.E, store=store,
                           date=datetime_, product=product,
@@ -134,17 +129,18 @@ class StockInputWidget(FWidget):
             try:
                 rep.save()
             except:
-                raise
-                raise_error("Error", u"Ce mouvement n'a pas pu être "
-                                     u"enrgistré dans les raports")
+                self.parent.Notify(
+                    u"Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
                 return False
 
         self.parent.change_context(GReportViewWidget)
-        self.parent.Notify("L'entrée des articles avec succès")
+        self.parent.Notify(u"L'entrée des articles avec succès", "success")
 
 
 class ResultatTableWidget(FTableWidget):
+
     """docstring for ResultatTableWidget"""
+
     def __init__(self, parent, *args, **kwargs):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
@@ -177,10 +173,10 @@ class ResultatTableWidget(FTableWidget):
     def _item_for_data(self, row, column, data, context=None):
         if column == 2:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                      img="go-next.png")), "Ajouter")
+                                                                     img="go-next.png")), "Ajouter")
         if column == 0:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                      img="info.png")), "")
+                                                                     img="info.png")), "")
         return super(ResultatTableWidget, self)._item_for_data(row, column,
                                                                data, context)
 
@@ -190,84 +186,6 @@ class ResultatTableWidget(FTableWidget):
             self.parent.table_info.refresh_(self.choix.id)
         if column == 2:
             self.parent.table_in.refresh_(self.choix)
-
-
-class InfoTableWidget(FWidget):
-
-    def __init__(self, parent, *args, **kwargs):
-        super(FWidget, self).__init__(parent=parent, *args, **kwargs)
-
-        self.parent = parent
-
-        self.refresh()
-        self.store = QLabel(" ")
-
-        self.nameLabel = QLabel("")
-        self.name = QLabel(" ")
-        self.stock_remaining = QLabel(" ")
-        self.imagelabel = QLabel("")
-        self.image = Button_menu("")
-        self.image.clicked.connect(self.chow_image)
-
-        gridbox = QGridLayout()
-        gridbox.addWidget(self.nameLabel, 1, 0)
-        gridbox.addWidget(self.name, 1, 1)
-        # gridbox.addWidget(self.store, 0, 1)
-        gridbox.addWidget(self.store, 4, 0, 1, 2)
-        gridbox.addWidget(self.imagelabel, 5, 0, 1, 5)
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.image)
-
-        vbox = QVBoxLayout()
-        vbox.addLayout(gridbox)
-        vbox.addLayout(hbox)
-        self.setLayout(vbox)
-
-    def refresh_(self, idd):
-
-        self.prod = Product.get(id=idd)
-        self.nameLabel.setText((u"<h4>Article:</h4>"))
-        self.name.setText(u"<h6>{name}</h6>".format(name=self.prod.name.title()))
-        rest_by_store = ""
-
-        for store in Store.select():
-            remaining, nbr_parts = store.get_remaining_and_nb_parts(self.prod)
-
-            if remaining < 10:
-                color_style = 'color: DarkGreen'
-            if remaining <= 5:
-                color_style = 'color: LightCoral'
-            if remaining <= 2:
-                color_style = 'color: red; text-decoration: blink'
-            if remaining >= 10:
-                color_style = 'color: LimeGreen;'
-            color_style = color_style + "; border:3px solid green; font-size: 15px"
-
-            rest_by_store += u"<div> {store}: <strong style='{color_style}'>" \
-                             u" {remaining} </strong> ({nbr_parts} pièces)"\
-                             u"</div>".format(store=store.name,
-                                              color_style=color_style,
-                                              remaining=remaining,
-                                              nbr_parts=nbr_parts)
-
-        self.store.setText(u"<h4><u>Quantité restante</u>:</h4> \
-                           {remaining}</ul>".format(remaining=rest_by_store))
-
-        self.imagelabel.setText(u"<b>Pas d'image<b>")
-        self.image.setStyleSheet("")
-        if self.prod.image_link:
-            self.imagelabel.setText(u"<b><u>Image</u></b>")
-            self.image.setStyleSheet("background: url({image})"
-                                     " no-repeat scroll 20px 110px #CCCCCC;"
-                                     "width: 55px".format(image=self.prod.image_link))
-
-    def chow_image(self):
-        """ doit afficher l'image complete dans une autre fenetre"""
-        from GCommon.ui.show_image import ShowImageViewWidget
-        try:
-            self.parent.open_dialog(ShowImageViewWidget, modal=True, prod=self.prod)
-        except AttributeError:
-            pass
 
 
 class InputTableWidget(FTableWidget):
@@ -321,7 +239,7 @@ class InputTableWidget(FTableWidget):
         self.setRowCount(nb_rows + 1)
         # self.setSpan(nb_rows, 0, 1, 1)
         bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                      img='save.png')))
+                                                                     img='save.png')))
         self.button = QPushButton(bicon, u"Enrgistrer l'entrée")
         self.button.released.connect(self.parent.save_b)
         self.setCellWidget(nb_rows, 1, self.button)
@@ -336,8 +254,8 @@ class InputTableWidget(FTableWidget):
             self.line_edit.textChanged.connect(self.changed_value)
             return self.line_edit
         return super(InputTableWidget, self)._item_for_data(row,
-                                                                column, data,
-                                                                context)
+                                                            column, data,
+                                                            context)
 
     def _update_data(self, row_num, new_data):
         self.data[row_num] = (new_data[0], self.data[row_num][1], new_data[0])
@@ -368,7 +286,8 @@ class InputTableWidget(FTableWidget):
             stylerreur = "background-color: rgb(255, 235, 235);border: 3px double SeaGreen"
             if qtsaisi == 0:
                 viderreur_qtsaisi = stylerreur
-                self.cellWidget(row_num, 0).setToolTip(u"La quantité est obligatoire")
+                self.cellWidget(row_num, 0).setToolTip(
+                    u"La quantité est obligatoire")
                 self.isvalid = False
 
             self.cellWidget(row_num, 0).setStyleSheet(viderreur_qtsaisi)

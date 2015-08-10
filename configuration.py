@@ -10,8 +10,10 @@ from Common import peewee
 
 
 class Config(Constants):
+
     """ docstring for Config
                             """
+
     def __init__(self):
         Constants.__init__(self)
 
@@ -25,7 +27,7 @@ class Config(Constants):
         DB_VERS = 1
     try:
         sttg = Organization().get(Organization.id == 1)
-        LOGIN = sttg.login
+        # LOGIN = sttg.login
         NAME_ORGA = sttg.name_orga
         TEL_ORGA = sttg.phone
         ADRESS_ORGA = sttg.adress_org
@@ -36,7 +38,7 @@ class Config(Constants):
         pass
 
     # DEBUG = True
-    DEBUG = False
+    # DEBUG = False
 
     # # ------------------------- Organisation --------------------------#
 

@@ -8,9 +8,10 @@ from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QCheckBox)
 from PyQt4.QtCore import Qt, QDate, SIGNAL
 
 from configuration import Config
-from Common.ui.util import raise_success, raise_error, date_to_datetime
+from Common.ui.util import raise_error, date_to_datetime
 from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
-                              IntLineEdit, Button_save, FormatDate, Deleted_btt)
+                              IntLineEdit, Button_save, FormatDate, Deleted_btt,
+                              QLineEdit)
 from Common.ui.table import FTableWidget
 
 from models import Product
@@ -42,18 +43,28 @@ class OrderViewWidget(FWidget):
         self.connect(self.restor_order_btt, SIGNAL('clicked()'),
                      self.remove_save)
 
+        self.search_field = QLineEdit()
+        self.search_field.setPlaceholderText("Rechercher un article")
+        self.search_field.setMaximumSize(200,
+                                         self.search_field.maximumSize().height())
+        self.search_field.textChanged.connect(self.finder)
+
         # Grid
         gridbox = QGridLayout()
-        gridbox.addWidget(FormLabel(u"Date"), 0, 0)
-        gridbox.addWidget(self.com_date, 0, 1)
-        gridbox.setColumnStretch(1, 5)
-        gridbox.addWidget(self.restor_order_btt, 2, 2)
-        # gridbox.addWidget(self.save_order_btt, 2, 3)
-        gridbox.addWidget(self.export_xls_btt, 2, 4)
+        gridbox.addWidget(self.search_field, 0, 0)
+        # gridbox.addWidget(FormLabel(u"Date"), 0, 3)
+        gridbox.setColumnStretch(2, 2)
+        # gridbox.setColumnStretch(1, 2)
+        gridbox.addWidget(self.restor_order_btt, 0, 3)
+        gridbox.addWidget(self.com_date, 0, 4)
+        gridbox.addWidget(self.export_xls_btt, 0, 5)
         vbox.addWidget(self.title)
         vbox.addLayout(gridbox)
         vbox.addWidget(self.order_table)
         self.setLayout(vbox)
+
+    def finder(self, value):
+        self.order_table.refresh_(value)
 
     def refresh(self):
         self.order_table.refresh()
@@ -68,6 +79,7 @@ class OrderViewWidget(FWidget):
 
 
 class OrederTableWidget(FTableWidget):
+
     """ """
 
     def __init__(self, parent, *args, **kwargs):
@@ -75,27 +87,31 @@ class OrederTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [u"CHOIX", u"QUANTITE", u"DESCRIPTION", u"ITEM NO"]
+        self.hheaders = [u"CHOIX", u"QUANTITE", u"DESCRIPTION"]
 
         # self.setEditTriggers(QAbstractItemView.EditTriggers(True))
         self.stretch_columns = [2]
         self.align_map = {0: 'r', 1: 'r', 2: 'l'}
         self.display_vheaders = False
         self.live_refresh = False
+        self.display_fixed = True
+
         self.refresh_()
 
-    def refresh_(self):
+    def refresh_(self, value=None):
         """ """
         self._reset()
-        self.set_data_for()
+        self.set_data_for(value)
         self.refresh()
 
-    def set_data_for(self, *args):
+    def set_data_for(self, prod_find):
+        products = Product.select().order_by(Product.name.asc())
+        if prod_find:
+            products = products.where(Product.name.contains(prod_find))
         rest = self.restor_pew_order()
         self.data = [(2 if prod.name in rest.keys() else 0,
-                     rest[prod.name] if prod.name in rest.keys() else "",
-                     prod.name, prod.code) for prod in Product.all()]
-
+                      rest[prod.name] if prod.name in rest.keys() else "",
+                      prod.name) for prod in products]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0:
@@ -114,10 +130,12 @@ class OrederTableWidget(FTableWidget):
                                                              data, context)
 
     def save_order(self):
-        data =  self.getTableItems()
-        obj_file = open('tmp_order.txt', 'w') #fichier.txt est un fichier déjà créé par toi-même
-        obj_file.write(json.dumps(data)) #ecriture des données dans fichier.txt
-        obj_file.close()# fermeture du fichier quand plus aucune utilité
+        data = self.getTableItems()
+        # fichier.txt est un fichier déjà créé par toi-même
+        obj_file = open('tmp_order.txt', 'w')
+        # ecriture des données dans fichier.txt
+        obj_file.write(json.dumps(data))
+        obj_file.close()  # fermeture du fichier quand plus aucune utilité
 
     def getTableItems(self):
         n = self.rowCount()
@@ -130,7 +148,7 @@ class OrederTableWidget(FTableWidget):
             elif item.checkState() == Qt.Checked:
                 liste_item.append(self.is_int(self.cellWidget(i, 1).text()))
                 liste_item.append(str(self.item(i, 2).text()))
-                liste_item.append(str(self.item(i, 3).text()))
+                # liste_item.append(str(self.item(i, 3).text()))
                 commad_list.append(liste_item)
         return commad_list
 

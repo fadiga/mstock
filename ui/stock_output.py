@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-#maintainer: Fad
+# maintainer: Fad
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
@@ -9,7 +9,6 @@ from PyQt4.QtCore import QDate, Qt, QVariant, SIGNAL
 
 
 from configuration import Config
-from models import (Store, Product, Reports)
 from Common.ui.common import (FWidget, IntLineEdit, Button_menu,
                               FormLabel, FormatDate)
 from Common.ui.util import raise_error, is_int, date_to_datetime, date_on_or_end
@@ -17,13 +16,16 @@ from Common.ui.table import FTableWidget
 from Common.peewee import fn
 
 from ui.reports_managers import GReportViewWidget
+from ui._detail_product import InfoTableWidget
+from models import (Store, Product, Reports)
 
 
 class StockOutputWidget(FWidget):
 
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(StockOutputWidget, self).__init__(parent=parent, *args, **kwargs)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      SORTIE STOCK ")
+        self.parentWidget().setWindowTitle(
+            Config.NAME_ORGA + u"      SORTIE STOCK ")
         self.parent = parent
 
         vbox = QVBoxLayout(self)
@@ -32,7 +34,7 @@ class StockOutputWidget(FWidget):
 
         self.date_out = FormatDate(QDate.currentDate())
 
-        #Combobox widget for add store
+        # Combobox widget for add store
         self.liste_store = Store.all()
 
         self.box_store = QComboBox()
@@ -42,8 +44,9 @@ class StockOutputWidget(FWidget):
             self.box_store.addItem(sentence, op.id)
 
         self.search_field = QLineEdit()
-        self.search_field.setToolTip("Rechercher un produit")
-        self.search_field.setMaximumSize(200, self.search_field.maximumSize().height())
+        self.search_field.setPlaceholderText("Rechercher un article")
+        self.search_field.setMaximumSize(
+            200, self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
         self.vline = QFrame()
@@ -58,8 +61,8 @@ class StockOutputWidget(FWidget):
                                self.table_out.changed_value)
 
         self.table_resultat.refresh_("")
-        editbox.addWidget(FormLabel(u"Recherche:"), 0, 0)
-        editbox.addWidget(self.search_field, 0, 1)
+        # editbox.addWidget(FormLabel(u"Recherche:"), 0, 0)
+        editbox.addWidget(self.search_field, 0, 0)
 
         editbox.addWidget(self.vline, 0, 2, 1, 1)
 
@@ -116,15 +119,16 @@ class StockOutputWidget(FWidget):
             try:
                 rep.save()
             except:
-                raise_error("Error", u"Ce mouvement n'a pas pu être "
-                                     u"enrgistré dans les raports")
+                self.parent.Notify(
+                    u"Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
                 return False
 
         self.parent.change_context(GReportViewWidget)
-        self.parent.Notify("Sortie des articles avec succès")
+        self.parent.Notify(u"La sortie des articles avec succès", "success")
 
 
 class ResultatTableWidget(FTableWidget):
+
     """docstring for ResultatTableWidget"""
 
     def __init__(self, parent, *args, **kwargs):
@@ -152,21 +156,21 @@ class ResultatTableWidget(FTableWidget):
     def set_data_for(self, value):
 
         products = [(Product.get(id=rpt.product_id).name) for rpt in
-                     Reports.select(fn.Distinct(Reports.product))]
+                    Reports.select(fn.Distinct(Reports.product))]
         if value:
-            products = [(prod.name) for prod in Product.select().where(Product.name.contains(value))\
-                              .where(Product.name << products).order_by(Product.name.desc())]
+            products = [(prod.name) for prod in Product.select().where(Product.name.contains(value))
+                        .where(Product.name << products).order_by(Product.name.desc())]
         self.data = [("", rpt, "") for rpt in products]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 2:
             return QTableWidgetItem(
                 QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                              img="go-next.png")), "Ajouter")
+                                                 img="go-next.png")), "Ajouter")
         if column == 0:
             return QTableWidgetItem(
                 QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                        img="info.png")), "")
+                                                 img="info.png")), "")
         return super(ResultatTableWidget, self)._item_for_data(row, column,
                                                                data, context)
 
@@ -176,83 +180,6 @@ class ResultatTableWidget(FTableWidget):
             self.parent.table_info.refresh_(self.choix.id)
         if column == 2:
             self.parent.table_out.refresh_(self.choix)
-
-
-class InfoTableWidget(FWidget):
-
-    def __init__(self, parent, *args, **kwargs):
-        super(FWidget, self).__init__(parent=parent, *args, **kwargs)
-
-        self.parent = parent
-
-        self.refresh()
-        self.store = QLabel(" ")
-
-        self.nameLabel = QLabel("")
-        self.name = QLabel(" ")
-        self.stock_remaining = QLabel(" ")
-        self.imagelabel = QLabel("")
-        self.image = Button_menu("")
-        self.image.clicked.connect(self.chow_image)
-
-        gridbox = QGridLayout()
-        gridbox.addWidget(self.nameLabel, 1, 0)
-        gridbox.addWidget(self.name, 1, 1)
-        gridbox.addWidget(self.store, 4, 0, 1, 2)
-        gridbox.addWidget(self.imagelabel, 5, 0, 1, 5)
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.image)
-
-        vbox = QVBoxLayout()
-        vbox.addLayout(gridbox)
-        vbox.addLayout(hbox)
-        self.setLayout(vbox)
-
-    def refresh_(self, idd):
-
-        self.prod = Product.get(id=idd)
-        self.nameLabel.setText((u"<h4>Article:</h4>"))
-        self.name.setText(u"<h6>{name}</h6>".format(name=self.prod.name.title()))
-        rest_by_store = ""
-
-        for store in Store.select():
-            remaining, nbr_parts = store.get_remaining_and_nb_parts(self.prod)
-
-            if remaining < 10:
-                color_style = 'color: DarkGreen'
-            if remaining <= 5:
-                color_style = 'color: LightCoral'
-            if remaining <= 2:
-                color_style = 'color: red; text-decoration: blink'
-            if remaining >= 10:
-                color_style = 'color: LimeGreen;'
-            color_style = color_style + "; border:3px solid green; font-size: 15px"
-
-            rest_by_store += u"<div> {store}: <strong style='{color_style}'>" \
-                             u" {remaining} </strong> ({nbr_parts} pièces)"\
-                             u"</div>".format(store=store.name,
-                                              color_style=color_style,
-                                              remaining=remaining,
-                                              nbr_parts=nbr_parts)
-
-        self.store.setText(u"<h4><u>Quantité restante</u>:</h4> \
-                           {remaining}</ul>".format(remaining=rest_by_store))
-
-        self.imagelabel.setText(u"<b>Pas d'image<b>")
-        self.image.setStyleSheet("")
-        if self.prod.image_link:
-            self.imagelabel.setText(u"<b><u>Image</u></b>")
-            self.image.setStyleSheet("background: url({image})"
-                                     " no-repeat scroll 20px 110px #CCCCCC;"
-                                     "width: 55px".format(image=self.prod.image_link))
-
-    def chow_image(self):
-        """ doit afficher l'image complete dans une autre fenetre"""
-        from GCommon.ui.show_image import ShowImageViewWidget
-        try:
-            self.parent.open_dialog(ShowImageViewWidget, modal=True, prod=self.prod)
-        except AttributeError:
-            pass
 
 
 class InproductTableWidget(FTableWidget):
@@ -268,7 +195,6 @@ class InproductTableWidget(FTableWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
 
-
         self.stretch_columns = [0, 1]
         self.align_map = {1: "l", 2: "l"}
         # self.ecart = 144
@@ -282,7 +208,6 @@ class InproductTableWidget(FTableWidget):
             if not [row for row in self.data if self.row[1] in row]:
                 self.set_data_for()
                 self.refresh()
-
 
     def set_data_for(self):
 
@@ -309,7 +234,7 @@ class InproductTableWidget(FTableWidget):
 
         self.setRowCount(nb_rows + 1)
         bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                      img='save.png')))
+                                                                     img='save.png')))
         self.button = QPushButton(bicon, u"Enrgistrer la sortie")
         self.button.released.connect(self.parent.save_report)
         self.setCellWidget(nb_rows, 1, self.button)
@@ -347,14 +272,15 @@ class InproductTableWidget(FTableWidget):
 
     def changed_value(self, refresh=False):
         """ Calcule les Resultat """
-        current_store = self.parent.liste_store[self.parent.box_store.currentIndex()]
+        current_store = self.parent.liste_store[
+            self.parent.box_store.currentIndex()]
 
         for row_num in xrange(0, self.data.__len__()):
             self.isvalid = True
             try:
                 last_report = Reports.filter(store=current_store,
                                              product__name=str(self.item(row_num, 1)
-                                             .text())).order_by(Reports.date.desc()).get()
+                                                               .text())).order_by(Reports.date.desc()).get()
                 qtremaining = last_report.remaining
 
                 date_out = str(self.parent.date_out.text())

@@ -2,7 +2,8 @@
 # -*- encoding: utf-8 -*-
 # vim: ai ts=4 sts=4 et sw=4 nu
 # maintainer: Fad
-from __future__ import (unicode_literals, absolute_import, division, print_function)
+from __future__ import (
+    unicode_literals, absolute_import, division, print_function)
 
 from datetime import datetime
 from PyQt4.QtGui import (QVBoxLayout, QIcon, QTableWidgetItem)
@@ -21,12 +22,15 @@ from ui.invoice_show import ShowInvoiceViewWidget
 
 
 class DashbordViewWidget(FWidget):
+
     """ Shows the home page  """
 
     def __init__(self, parent=0, *args, **kwargs):
-        super(DashbordViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(DashbordViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
 
-        self.parentWidget().setWindowTitle(Config.APP_NAME + u"    TABLEAU DE BORD")
+        self.parentWidget().setWindowTitle(
+            Config.APP_NAME + u"    TABLEAU DE BORD")
 
         self.parent = parent
         vbox = QVBoxLayout()
@@ -36,7 +40,8 @@ class DashbordViewWidget(FWidget):
 
         self.search_field = LineEdit()
         self.search_field.setToolTip("Rechercher un produit")
-        self.search_field.setMaximumSize(500, self.search_field.maximumSize().height())
+        self.search_field.setMaximumSize(
+            500, self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
         self.title = FPageTitle("TABLEAU DE BORD")
@@ -52,7 +57,8 @@ class DashbordViewWidget(FWidget):
         table_invoice.addWidget(self.table_invoice)
 
         self.table_mouvement = GReportTableWidget(parent=self)
-        self.title_mouvement = FBoxTitle(show_date(self.table_mouvement.today, time=False))
+        self.title_mouvement = FBoxTitle(
+            show_date(self.table_mouvement.today, time=False))
         # table_invoice.addWidget(self.title_invoice)
         table_mouvement.addWidget(self.title_mouvement)
         table_mouvement.addWidget(self.table_mouvement)
@@ -69,7 +75,9 @@ class DashbordViewWidget(FWidget):
 
 
 class GReportTableWidget(FTableWidget):
+
     """ """
+
     def __init__(self, parent, *args, **kwargs):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
@@ -88,7 +96,7 @@ class GReportTableWidget(FTableWidget):
 
     def refresh_(self):
         """ """
-        #je cache la 6 eme colonne
+        # je cache la 6 eme colonne
         self._reset()
         self.set_data_for()
         self.refresh()
@@ -104,24 +112,24 @@ class GReportTableWidget(FTableWidget):
                       formatted_number(rap.qty_use),
                       formatted_number(rap.remaining),
                       show_date(rap.date))
-                      for rap in Reports.select().where(
-                        Reports.date < date_on_or_end(self.today, on=False),
-                        Reports.date > date_on_or_end(self.today)
-                        ).order_by(Reports.id.desc())]
+                     for rap in Reports.select().where(
+            Reports.date < date_on_or_end(self.today, on=False),
+            Reports.date > date_on_or_end(self.today)
+        ).order_by(Reports.id.desc())]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0 and self.data[row][0] == Reports.E:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="in.png")), u"")
+                                                                     img="in.png")), u"")
         if column == 0 and self.data[row][0] == Reports.S:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="out.png")), u"")
+                                                                     img="out.png")), u"")
 
         return super(GReportTableWidget, self)._item_for_data(row, column,
-                                                               data, context)
+                                                              data, context)
 
     def click_item(self, row, column, *args):
-       pass
+        pass
 
 
 class InvoiceTableWidget(FTableWidget):
@@ -155,11 +163,11 @@ class InvoiceTableWidget(FTableWidget):
 
         if value:
             try:
-                invoices = Invoice.select().where(Invoice.number==int(value))
+                invoices = Invoice.select().where(Invoice.number == int(value))
             except Exception as e:
                 Config.logging.error(e)
                 invoices = Invoice.select().where(Invoice.location.contains(value) |
-                               Invoice.client.contains(value))
+                                                  Invoice.client.contains(value))
         else:
             invoices = Invoice.select().order_by(Invoice.number.asc())
 
@@ -169,7 +177,7 @@ class InvoiceTableWidget(FTableWidget):
     def _item_for_data(self, row, column, data, context=None):
         if column == self.data[0].__len__() - 1:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                   img="go-next.png")), (u"voir"))
+                                                                     img="go-next.png")), (u"voir"))
 
         return super(InvoiceTableWidget, self)._item_for_data(row, column,
                                                               data, context)
@@ -194,7 +202,8 @@ class AlertTableWidget(FTableWidget):
         self.hheaders += [u"Produits", u"Quantité restante",
                           u"Date de la dernière operation"]
 
-        self.align_map = {0: 'l', 1: 'l', 2: 'r'} if multi_store else {0: 'l', 1: 'r', 2: 'r'}
+        self.align_map = {0: 'l', 1: 'l', 2: 'r'} if multi_store else {
+            0: 'l', 1: 'r', 2: 'r'}
         self.sorter = True
         self.refresh_()
 
@@ -208,7 +217,7 @@ class AlertTableWidget(FTableWidget):
         reports = lastes_upper_of(10)
         if multi_store:
             self.data = [(rep.store.name, rep.product.name, rep.remaining, show_date(rep.date))
-                          for rep in reports]
+                         for rep in reports]
         else:
             self.data = [(rep.product.name, rep.remaining, show_date(rep.date))
-                          for rep in reports]
+                         for rep in reports]

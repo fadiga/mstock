@@ -43,7 +43,7 @@ class MenuBar(FMenuBar, FWidget):
                  {"name": u"State", "icon": 'state', "admin": False, "shortcut": "Ctrl+R", "goto": StateStockViewWidget},
                  {"name": u"Magasin", "icon": 'store', "admin": False, "shortcut": "Ctrl+M", "goto": StoresViewWidget},
                  {"name": u"Facturation", "icon": 'invoice', "admin": False, "shortcut": "Ctrl+F", "goto": InvoiceViewWidget},
-                 {"name": u"Les mouvements", "icon": 'reports', "admin": False, "shortcut": "alt+T", "goto": GReportViewWidget},
+                 {"name": u"Mouvements", "icon": 'reports', "admin": False, "shortcut": "alt+T", "goto": GReportViewWidget},
         ]
 
         # Menu aller à

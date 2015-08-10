@@ -11,5 +11,5 @@ media/img_prod/
 *.manifest
 img_prod/
 *.xls
-dict/
+dist/
 *.txt

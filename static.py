@@ -16,8 +16,8 @@ class Constants(CConstants):
         CConstants.__init__(self)
 
     # des_image_record = "static/img_prod"
-    ARMOIRE = "img_prod"
-    des_image_record = os.path.join(ROOT_DIR, ARMOIRE)
+    # ARMOIRE = "img_prod"
+    # des_image_record = os.path.join(ROOT_DIR, ARMOIRE)
 
     PEEWEE_V = 224
     credit = 17
@@ -25,7 +25,7 @@ class Constants(CConstants):
     nb_warning = 5
     # type_period = W
     # type_period = M
-
+    # DEBUG = False
     DOC_SUPPORT = "*.gif *.png *.jpg *.doc *.docx *.pdf *.jpeg"
     # -------- Application -----------#
 

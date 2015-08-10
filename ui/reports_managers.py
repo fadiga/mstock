@@ -4,10 +4,11 @@
 
 from datetime import date
 from PyQt4.QtCore import Qt, SIGNAL, SLOT, QDate
-from PyQt4.QtGui import (QVBoxLayout, QGridLayout,QTableWidgetItem, QIcon, QMenu)
+from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QTableWidgetItem,
+                         QIcon, QMenu)
 
 from configuration import Config
-from models import Reports
+from models import Reports, Product
 from Common.ui.common import (FWidget, FPageTitle, FormatDate, Button,
                               BttExportXLS, FormLabel)
 from Common.ui.table import FTableWidget
@@ -73,13 +74,27 @@ class GReportTableWidget(FTableWidget):
                          u"Restante", u"Date", u""]
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
-
+        self.setMouseTracking(True)
+        self.current_hover = [0, 0]
+        self.cellEntered.connect(self.cellHover)
 
         self.stretch_columns = [1, 2, 5]
-        self.align_map = {0: 'l', 1: "l", 2: "l"}
+        self.align_map = {0: 'l', 1: "l", 2: "l", 3: "r", 4: "r"}
         self.ecart = 144
         self.display_vheaders = False
         self.refresh_()
+
+    def cellHover(self, row, column):
+        item = self.item(row, column)
+        if self.current_hover != [row, column]:
+            # item.setBackground(QColor('moccasin'))
+            if column in [3, 4]:
+                item = self.item(row, column)
+                name_product = self.data[item.row()][2]
+                qtte_in_box = Product.select().where(
+                        Product.name==str(name_product)).get().number_parts_box
+                item.setToolTip("{} pièces".format(int(self.data[item.row()][item.column()]) * int(qtte_in_box)))
+            self.current_hover = [row, column]
 
     def refresh_(self, on=None, end=None):
         """ """
@@ -91,7 +106,6 @@ class GReportTableWidget(FTableWidget):
         self.setColumnWidth(0, 40)
 
     def set_data_for(self, on, end):
-
         self.data = [(rap.type_, rap.store.name, rap.product,
                       formatted_number(rap.qty_use),
                       formatted_number(rap.remaining),

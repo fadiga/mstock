@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding= UTF-8 -*-
-#maintainer: Fadiga
+# maintainer: Fadiga
 
 import xlwt
 
@@ -37,7 +37,7 @@ pat2 = xlwt.Pattern()
 pat2.pattern = xlwt.Pattern.SOLID_PATTERN
 pat2.pattern_fore_colour = 0x01F
 
-#styles
+# styles
 style_title = xlwt.easyxf('font: name Cooper Black, height 250, bold on,'
                           'color blue')
 style_title.alignment = al_center
@@ -69,7 +69,8 @@ int_style = xlwt.easyxf('font: name Times New Roman, height 250, bold off')
 int_style.borders = borders
 int_style.alignment = al_right
 
-style_code = xlwt.easyxf('font: name Times New Roman, height 250, bold off, color blue')
+style_code = xlwt.easyxf(
+    'font: name Times New Roman, height 250, bold off, color blue')
 style_code.borders = borders
 
 
@@ -115,7 +116,8 @@ def write_report_xls(file_name, data):
                                           rap.product.code_prod), style_row_table)
         sheet.write(rowx, 2, rap.nbr_carton, style_row_table)
         sheet.write(rowx, 3, rap.remaining, style_row_table)
-        sheet.write(rowx, 4, rap.date.strftime(u'%x %Hh:%Mmn'), style_row_table)
+        sheet.write(
+            rowx, 4, rap.date.strftime(u'%x %Hh:%Mmn'), style_row_table)
         rowx += 1
     book.save(file_name)
 
@@ -146,20 +148,18 @@ def write_order_xls(file_name, order):
     date_com = u"Bko le %s" % com_date.strftime("%d/%m/%Y")
     sheet.write_merge(rowx, rowx, 2, 2, date_com, style_)
 
-    title = [u"QUANTITE", u"DESCRIPTION", u"ITEM NO"]
-
+    title = [u"QUANTITE", u"DESCRIPTION"]
     rowx += 2
-    for colx, val_center in enumerate(title):
-        sheet.write(rowx, colx, val_center, style_t_table)
+    colx = 0
+    sheet.write(rowx, colx, title[0], style_t_table)
+    colx += 1
+    sheet.write_merge(rowx, rowx, colx, colx + 1, title[1], style_t_table)
     rowx += 1
     for prod in order:
-        print(prod)
         col = 0
         sheet.write_merge(rowx, rowx, col, col, prod[0], int_style)
         col += 1
-        sheet.write_merge(rowx, rowx, col, col, prod[1], style)
-        col += 1
-        sheet.write_merge(rowx, rowx, col, col, prod[2], style_code)
+        sheet.write_merge(rowx, rowx, col, col + 1, prod[1], style)
         rowx += 1
     book.save(file_name)
 
@@ -189,7 +189,7 @@ def write_invoice_xls(file_name, invoice):
 
     data = [(item.quantity, item.description.name, item.price,
              item.quantity * item.price)
-             for item in InvoiceItem.filter(invoices=invoice)]
+            for item in InvoiceItem.filter(invoices=invoice)]
 
     for prod in data:
         col = 0

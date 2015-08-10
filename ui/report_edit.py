@@ -6,7 +6,7 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 from Common.ui.common import FWidget, FBoxTitle, FPageTitle, Button, FormatDate
-from Common.ui.util import raise_success, date_to_datetime
+from Common.ui.util import date_to_datetime
 from models import Reports, Product
 
 
@@ -29,7 +29,7 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
         formbox = QtGui.QVBoxLayout()
         editbox = QtGui.QGridLayout()
         formbox.addWidget(FBoxTitle(u"Modification"))
-        #Combobox widget
+        # Combobox widget
 
         i = 0
         self.liste_type = Reports.TYPES
@@ -41,14 +41,14 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
             sentence = u"%(type_)s" % {'type_': ty}
             self.box_type.addItem(sentence, QtCore.QVariant(ty))
             self.box_prod.setCurrentIndex(i)
-        #Combobox widget
+        # Combobox widget
         # self.liste_store = Store.order_by(desc(Store.id)).all()
         # self.box_mag = QtGui.QComboBox()
         # for index in xrange(0, len(self.liste_store)):
         #     op = self.liste_store[index]
         #     sentence = _(u"%(name)s") % {'name': op.name}
         #     self.box_mag.addItem(sentence, QtCore.QVariant(op.id))
-        #Combobox widget
+        # Combobox widget
 
         self.liste_product = Product.all()
         self.box_prod = QtGui.QComboBox()
@@ -88,7 +88,7 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
 
         type_ = self.box_type.currentIndex()
         product = self.liste_product[self.box_prod.currentIndex()]
-        qty_use = unicode(self.nbr_carton.text())
+        qty_use = str(self.nbr_carton.text())
         date_ = self.date_.text()
         datetime_ = date_to_datetime(date_)
 
@@ -100,4 +100,4 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
         report.date = datetime_
         report.save()
         self.cancel()
-        raise_success(u"Confirmation", u"Votre rapport a été modifié")
+        self.parent.Notify(u"Votre rapport a été modifié", "success")

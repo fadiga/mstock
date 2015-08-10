@@ -19,7 +19,6 @@ from ui.statusbar import GStatusBar
 from ui.dashboard import DashbordViewWidget
 
 
-
 class MainWindow(FMainWindow):
     def __init__(self):
         FMainWindow.__init__(self)
@@ -54,18 +53,4 @@ class MainWindow(FMainWindow):
     def active_menu(self):
         self.menubar = MenuBar(self)
         self.setMenuBar(self.menubar)
-
-    def logout(self):
-        try:
-            self.menubar.setEnabled(False)
-        except:
-            pass
-        try:
-            self.toolbar.close()
-        except:
-            pass
-
-        for ur in Owner.all():
-            ur.islog = False
-            ur.save()
 
