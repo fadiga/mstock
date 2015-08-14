@@ -48,7 +48,7 @@ class DashbordViewWidget(FWidget):
 
         self.title_alert = FBoxTitle(u"Les alertes ")
         self.table_alert = AlertTableWidget(parent=self)
-        table_alert.addWidget(self.title_alert)
+        # table_alert.addWidget(self.title_alert)
         table_alert.addWidget(self.table_alert)
 
         self.title_invoice = FBoxTitle(u"Les stocks actual")
@@ -60,7 +60,7 @@ class DashbordViewWidget(FWidget):
         self.title_mouvement = FBoxTitle(
             show_date(self.table_mouvement.today, time=False))
         # table_invoice.addWidget(self.title_invoice)
-        table_mouvement.addWidget(self.title_mouvement)
+        # table_mouvement.addWidget(self.title_mouvement)
         table_mouvement.addWidget(self.table_mouvement)
         tab_widget = tabbox((table_mouvement, u"Les Mouvements"),
                             (table_invoice, u"Les Factures"),

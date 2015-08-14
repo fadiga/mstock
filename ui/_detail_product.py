@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
-from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel,
-                         QGridLayout)
+from PyQt4.QtGui import (QHBoxLayout, QGridLayout)
 from PyQt4.QtCore import QDate, Qt, QVariant, SIGNAL
 
 from models import (Store, Product, Reports)
-from Common.ui.common import (FWidget, IntLineEdit, Button_menu,
-                              FormLabel, FormatDate)
+from Common.ui.common import (FWidget, BttSmall, FLabel)
 
 
 class InfoTableWidget(FWidget):
@@ -19,13 +17,17 @@ class InfoTableWidget(FWidget):
         self.parent = parent
 
         self.refresh()
-        self.info_box = QLabel(" ")
-        self.image = Button_menu("")
-        self.image.clicked.connect(self.chow_image)
+        self.info_box = FLabel(" ")
+        self.image = FLabel(" ")
+        self.image_btt = BttSmall("Zoom")
+        self.image_btt.clicked.connect(self.show_image)
 
-        hbox = QVBoxLayout()
-        hbox.addWidget(self.info_box)
-        hbox.addWidget(self.image)
+        hbox = QHBoxLayout()
+        gridbox = QGridLayout()
+        gridbox.addWidget(self.info_box, 0, 0)
+        gridbox.addWidget(self.image, 1, 0)
+        gridbox.addWidget(self.image_btt, 1, 1)
+        hbox.addLayout(gridbox)
         self.setLayout(hbox)
 
     def refresh_(self, idd):
@@ -52,21 +54,22 @@ class InfoTableWidget(FWidget):
                 </li>""".format(store=store.name, color_style=color_style,
                                 remaining=remaining,
                                 nbr_parts=nbr_parts * remaining)
+        width = height = 50
+        if self.prod.image_link:
+            width = 200
+            height = 100
 
         self.info_box.setText(u"""<h2>{name}</h2>
             <h4>Quantité restante:</h4>
-            <ul>{remaining}
-            <li><button type="submit"><img src="{image}"/></button></li></ul>
+            <ul>{remaining}</ul>
             """.format(name=self.prod.name,
-                       remaining=rest_by_store, image=self.prod.image_link))
-        self.image.setStyleSheet("")
-        if self.prod.image_link:
-            self.image.setStyleSheet("""background: url({image})
-                no-repeat scroll 20px 10px #CCCCCC;
-                width: 55px""".format(image=self.prod.image_link))
+                       remaining=rest_by_store))
+        self.image.setText("""<img src="{image}" width='{width}'
+            height='{height}'>""".format(image=self.prod.image_link,
+                                         width=width, height=height))
 
-    def chow_image(self):
-        """ doit afficher l'image complete dans une autre fenetre"""
+    def show_image(self):
+        """ afficher l'image complete dans une autre fenetre"""
         from GCommon.ui.show_image import ShowImageViewWidget
         try:
             self.parent.open_dialog(

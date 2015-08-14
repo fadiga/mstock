@@ -15,10 +15,6 @@ class Constants(CConstants):
     def __init__(self):
         CConstants.__init__(self)
 
-    # des_image_record = "static/img_prod"
-    # ARMOIRE = "img_prod"
-    # des_image_record = os.path.join(ROOT_DIR, ARMOIRE)
-
     PEEWEE_V = 224
     credit = 17
     tolerance = 50

@@ -8,7 +8,7 @@ from PyQt4 import QtGui, QtCore
 
 from configuration import Config
 from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
-                              Button,  FormatDate, IntLineEdit)
+                              BttSmall,  FormatDate, IntLineEdit)
 from database import Reports, Product
 from Common.ui.table import FTableWidget
 from Common.ui.util import formatted_number, is_int, date_on_or_end
@@ -18,17 +18,18 @@ from Common.exports_xls import export_dynamic_data
 class InventoryViewWidget(FWidget):
 
     def __init__(self, parent=0, *args, **kwargs):
-        super(InventoryViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(InventoryViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
         self.parent = parent
 
         self.title = u"Inventaire des articles"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + " "+ self.title)
+        self.parentWidget().setWindowTitle(Config.NAME_ORGA + " " + self.title)
 
         self.invent_table = InventoryTableWidget(parent=self)
 
         self.on_date = FormatDate(QtCore.QDate(date.today().year, 1, 1))
         self.end_date = FormatDate(QtCore.QDate.currentDate())
-        self.btt_ok = Button(u"Ok")
+        self.btt_ok = BttSmall(u"Ok")
         self.btt_ok.clicked.connect(self.rapport_filter)
         self.btt_export = BttExportXLS(u"Exporter")
         self.btt_export.clicked.connect(self.export_xls)
@@ -57,18 +58,19 @@ class InventoryViewWidget(FWidget):
                                    end=date_on_or_end(self.end_date.text(), on=False))
 
     def export_xls(self):
-        dict_data =  {
+        dict_data = {
             'file_name': "inventaire.xls",
-            'headers' : self.invent_table.hheaders,
+            'headers': self.invent_table.hheaders,
             'data': self.invent_table.data,
             'sheet': self.title,
             'widths': self.invent_table.stretch_columns,
             "date": "Du " + self.on_date.text() + " au " + self.end_date.text()
-         }
+        }
         export_dynamic_data(dict_data)
 
 
 class InventoryTableWidget(FTableWidget):
+
     """ """
 
     def __init__(self, parent, *args, **kwargs):
@@ -77,7 +79,8 @@ class InventoryTableWidget(FTableWidget):
         self.parent = parent
         self.pparent = parent.parent
 
-        self.hheaders = [u"Magasin", u"Code art.", u"Article", u"Quantité Restante"]
+        self.hheaders = [
+            u"Magasin", u"Code art.", u"Article", u"Quantité Restante"]
         self.stretch_columns = [0, 1, 2, 3]
         self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r'}
         self.display_vheaders = True
@@ -97,10 +100,10 @@ class InventoryTableWidget(FTableWidget):
             for prod in Product.all():
                 try:
                     reports.append(Reports.select().where(Reports.product == prod,
-                                                  Reports.date >= on,
-                                                  Reports.date <= end)
-                                          .order_by(Reports.date.desc())
-                                          .get())
+                                                          Reports.date >= on,
+                                                          Reports.date <= end)
+                                   .order_by(Reports.date.desc())
+                                   .get())
                 except:
                     pass
             self.data = [(rep.store.name, rep.product.code, rep.product.name, rep.remaining)

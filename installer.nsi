@@ -6,7 +6,7 @@
 
   !define MUI_PRODUCT "MStock"
   !define MUI_FILE "mmain"
-  !define MUI_VERSION "Ver. 4.0.1"
+  !define MUI_VERSION "Ver. 4.0.2"
   !define MUI_BRANDINGTEXT "${MUI_PRODUCT} ${MUI_VERSION}"
   !define IMAGES "images"
   !define CIMAGES "cimages"

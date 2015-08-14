@@ -33,7 +33,7 @@ class Config(Constants):
         ADRESS_ORGA = sttg.adress_org
         BP = sttg.bp
         EMAIL_ORGA = sttg.email_org
-        DEBUG = True
+        # DEBUG = True
     except peewee.OperationalError:
         pass
 

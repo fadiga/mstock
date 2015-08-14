@@ -16,7 +16,8 @@ class StateStockViewWidget(FWidget, FPeriodHolder):
 
     def __init__(self, parent=0, *args, **kwargs):
 
-        super(StateStockViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(StateStockViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
         FPeriodHolder.__init__(self, *args, **kwargs)
 
         self.title = u"     Les Activités"
@@ -32,7 +33,6 @@ class StateStockViewWidget(FWidget, FPeriodHolder):
         self.setLayout(vbox)
 
     def refresh(self):
-
         self.table.refresh()
 
     def change_period(self, main_date):
@@ -75,21 +75,22 @@ class ReportTableWidget(FTableWidget):
         this_periode_rpt = Reports.select().where(Reports.date >= on,
                                                   Reports.date <= end)
         for store in Store.select().order_by(Store.name):
-            if ([(i) for i in this_periode_rpt.where(Reports.store << [store,])] == []):
+            if ([(i) for i in this_periode_rpt.where(Reports.store << [store, ])] == []):
                 continue
             cpt = 0
             for prod in Product.select().order_by(Product.name):
-                if ([(i) for i in this_periode_rpt.where(Reports.store==store,
-                                 Reports.product << [prod,])] == []):
+                if ([(i) for i in this_periode_rpt.where(Reports.store == store,
+                                                         Reports.product << [prod, ])] == []):
                     continue
                 dict_store = {}
-                repts = this_periode_rpt.where(Reports.store==store, Reports.product==prod)
+                repts = this_periode_rpt.where(
+                    Reports.store == store, Reports.product == prod)
                 dict_store["store"] = store.name if cpt < 1 else ""
                 dict_store["product"] = prod.name
                 dict_store["sum_qty_in"] = repts.select(
-                    peewee.fn.SUM(Reports.qty_use)).where(Reports.type_==Reports.E).scalar()
+                    peewee.fn.SUM(Reports.qty_use)).where(Reports.type_ == Reports.E).scalar()
                 dict_store["sum_qty_out"] = repts.select(
-                    peewee.fn.SUM(Reports.qty_use)).where(Reports.type_==Reports.S).scalar()
+                    peewee.fn.SUM(Reports.qty_use)).where(Reports.type_ == Reports.S).scalar()
                 cpt += 1
                 reports.append(dict_store)
 
@@ -101,7 +102,7 @@ class ReportTableWidget(FTableWidget):
         if column == product_column:
             from ui.by_product import By_productViewWidget
             self.parent.change_main_context(By_productViewWidget,
-                                    product=self.data[row][product_column])
+                                            product=self.data[row][product_column])
         else:
             return
 

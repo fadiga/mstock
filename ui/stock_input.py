@@ -11,7 +11,7 @@ from configuration import Config
 from models import (Store, Product, Reports)
 
 from Common.ui.common import (FWidget, IntLineEdit, FormLabel, FormatDate,
-                              Button_menu, Button, Button_save)
+                              Button)
 from Common.ui.util import raise_error, is_int, date_to_datetime
 from Common.ui.table import FTableWidget
 
