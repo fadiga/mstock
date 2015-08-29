@@ -20,6 +20,7 @@ class InfoTableWidget(FWidget):
         self.info_box = FLabel(" ")
         self.image = FLabel(" ")
         self.image_btt = BttSmall("Zoom")
+        self.image_btt.setFlat(True)
         self.image_btt.clicked.connect(self.show_image)
 
         hbox = QHBoxLayout()

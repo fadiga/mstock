@@ -68,21 +68,6 @@ class MenuBar(FMenuBar, FWidget):
             goto_.addSeparator()
             goto_.addAction(el_menu)
 
-        preference = self.addMenu(u"Préference")
-        _theme = preference.addMenu("Theme")
-        theme1 = QAction(QIcon.fromTheme('', QIcon('')),
-                         u"Default", self)
-        self.connect(theme1, SIGNAL("triggered()"), self.theme1)
-        _theme.addAction(theme1)
-        theme2 = QAction(QIcon.fromTheme('', QIcon('')),
-                         u"Kad", self)
-        self.connect(theme2, SIGNAL("triggered()"), self.theme2)
-        _theme.addAction(theme2)
-        theme3 = QAction(QIcon.fromTheme('', QIcon('')),
-                         u"Fat", self)
-        self.connect(theme3, SIGNAL("triggered()"), self.theme3)
-        _theme.addAction(theme3)
-
         about = self.addMenu(u"Aide")
         about_ = QAction(QIcon.fromTheme('', QIcon('')),
                          u"À propos", self)
@@ -95,10 +80,3 @@ class MenuBar(FMenuBar, FWidget):
         sommaire_.setShortcut("Alt+S")
         self.connect(sommaire_, SIGNAL("triggered()"), self.goto_help)
         about.addAction(sommaire_)
-
-    def goto(self, goto):
-        self.change_main_context(goto)
-
-    # Aide
-    def goto_help(self):
-        self.open_dialog(HTMLView, modal=True)

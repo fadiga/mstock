@@ -13,3 +13,4 @@ img_prod/
 *.xls
 dist/
 *.txt
+fixture_product.py

@@ -12,11 +12,11 @@ from models import (Store, Product, Reports)
 
 from Common.ui.common import (FWidget, IntLineEdit, FormLabel, FormatDate,
                               Button)
-from Common.ui.util import raise_error, is_int, date_to_datetime
+from Common.ui.util import is_int, date_to_datetime
 from Common.ui.table import FTableWidget
 
 from ui.reports_managers import GReportViewWidget
-from ui._detail_product import InfoTableWidget
+from GCommon.ui._product_detail import InfoTableWidget
 
 
 class StockInputWidget(FWidget):
