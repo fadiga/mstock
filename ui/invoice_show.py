@@ -1,7 +1,8 @@
 #!usr/bin/env python
 # -*- encoding: utf-8 -*-
 # maintainer: Fad
-from __future__ import (unicode_literals, absolute_import, division, print_function)
+from __future__ import (
+    unicode_literals, absolute_import, division, print_function)
 
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
@@ -14,14 +15,16 @@ from models import Invoice, Reports
 from tools.export_pdf import pdFview
 from tools.export_xls import write_invoice_xls
 from Common.ui.util import formatted_number, is_int, uopen_file
-from Common.ui.common import (FWidget, FPageTitle, FLabel, LineEdit, Deleted_btt)
+from Common.ui.common import (
+    FWidget, FPageTitle, FLabel, LineEdit, Deleted_btt)
 from Common.ui.table import FTableWidget
 
 
 class ShowInvoiceViewWidget(FWidget):
 
     def __init__(self, invoice, parent=0, *args, **kwargs):
-        super(ShowInvoiceViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(ShowInvoiceViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
 
         self.invoice = invoice
 
@@ -40,9 +43,9 @@ class ShowInvoiceViewWidget(FWidget):
         formbox = QVBoxLayout()
         editbox = QGridLayout()
         xls_bicon = QIcon.fromTheme('',
-                            QIcon(u"{}xls.png".format(Config.img_cmedia)))
+                                    QIcon(u"{}xls.png".format(Config.img_cmedia)))
         pdFicon = QIcon.fromTheme('',
-                            QIcon(u"{}pdf.png".format(Config.img_cmedia)))
+                                  QIcon(u"{}pdf.png".format(Config.img_cmedia)))
         self.button_pdf = QPushButton(pdFicon, u"")
         self.button_pdf.setFixedWidth(30)
         self.button_pdf.setFixedHeight(30)
@@ -53,9 +56,9 @@ class ShowInvoiceViewWidget(FWidget):
         self.button_xls.released.connect(self.printer_xls)
 
         editbox.addWidget(FLabel(u"Facture N°: %s"
-                                        % self.invoice.number), 0, 0)
+                                 % self.invoice.number), 0, 0)
         editbox.addWidget(FLabel(u"%s le %s" % (self.invoice.location,
-                                                 self.invoice.date.strftime(u'%x'))), 1, 4)
+                                                self.invoice.date.strftime(u'%x'))), 1, 4)
         editbox.addWidget(FLabel(u"Doit: %s " % self.invoice.client), 1, 0)
         editbox.addWidget(self.button_pdf, 1, 5)
         editbox.addWidget(self.button_xls, 1, 6)
@@ -74,9 +77,9 @@ class ShowInvoiceViewWidget(FWidget):
 
     def annulation(self):
         reply = QMessageBox.question(self, 'Confirmation',
-                                    u"<h2 style='color:red;'>Voulez vous vraiment annuler cette"
-                                    u" facture?</h2>",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                                     u"<h2 style='color:red;'>Voulez vous vraiment annuler cette"
+                                     u" facture?</h2>",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             from ui.dashboard import DashbordViewWidget
@@ -102,7 +105,6 @@ class ShowInvoiceTableWidget(FTableWidget):
         # self.max_rows = 100
         # self.display_vheaders = False
         # self.display_fixed = True
-        print("ShowInvoiceTableWidget")
         self.refresh_()
 
     def refresh_(self):
@@ -119,7 +121,7 @@ class ShowInvoiceTableWidget(FTableWidget):
 
     def set_data_for(self):
 
-        items = self.parent.invoice.items if self.parent.invoice.items else  []
+        items = self.parent.invoice.items if self.parent.invoice.items else []
         self.data = [(item.quantity, item.description, item.price,
                       item.quantity * item.price) for item in items]
 
@@ -142,7 +144,8 @@ class ShowInvoiceTableWidget(FTableWidget):
         montant_ttc.setTextAlignment(Qt.AlignRight)
         self.setItem(row_num + 2, 3, montant_ttc)
 
-        # bicon = QIcon.fromTheme('', QIcon(u"{}del.png".format(Config.img_media)))
+        bicon = QIcon.fromTheme(
+            '', QIcon(u"{}del.png".format(Config.img_media)))
         # self.button = QPushButton(bicon, u"Annuler la facture")
         self.button = Deleted_btt(u"Annuler la facture")
         self.button.released.connect(self.parent.annulation)

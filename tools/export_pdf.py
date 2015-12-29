@@ -19,7 +19,7 @@ def pdFview(filename, invoice):
     if not filename:
         filename = get_temp_filename('pdf')
         print(filename)
-    #on recupere les items de la facture
+    # on recupere les items de la facture
     items_invoice = InvoiceItem.filter(invoices=invoice)
 
     # Static source pdf to be overlayed
@@ -77,7 +77,7 @@ def pdFview(filename, invoice):
             p.drawString(59, 80, "Pour acceptation: ")
 
         p.drawString(435, 80, "Le fournisseur: ")
-        #On calcul le montant total hors taxe et sa conversion en lettre
+        # On calcul le montant total hors taxe et sa conversion en lettre
         ht = 0
         for i in items_invoice:
             montant = i.price * i.quantity
@@ -87,8 +87,8 @@ def pdFview(filename, invoice):
 
         p.drawString(470, 150, str(ht).rjust(10, ' '))
         ht_en_lettre1, ht_en_lettre2 = controle_caratere(ht_en_lettre +
-                                                        " FCFA", 46, 40)
-        p.drawString(258, 116, (ht_en_lettre  + " FCFA"))
+                                                         " FCFA", 46, 40)
+        p.drawString(258, 116, (ht_en_lettre + " FCFA"))
         # p.drawString(258, 116, (ht_en_lettre1))
         # p.drawString(53, 100, (ht_en_lettre2))
 
