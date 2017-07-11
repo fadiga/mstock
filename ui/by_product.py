@@ -7,7 +7,7 @@ from datetime import datetime
 from PyQt4.QtGui import (QVBoxLayout, QTableWidgetItem)
 from PyQt4.QtCore import Qt
 
-from Common import peewee
+import peewee
 from configuration import Config
 from Common.ui.common import FWidget, FPeriodHolder, FPageTitle
 from Common.ui.table import FTableWidget
@@ -19,14 +19,16 @@ class By_productViewWidget(FWidget, FPeriodHolder):
 
     def __init__(self, product, parent=0, *args, **kwargs):
 
-        super(By_productViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(By_productViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
         FPeriodHolder.__init__(self, *args, **kwargs)
 
         self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      Par product")
 
         product = Product.select().where(Product.name.contains(product)).get()
 
-        self.title = FPageTitle(u"Rapports du product: {name}".format(name=product.name))
+        self.title = FPageTitle(
+            u"Rapports du product: {name}".format(name=product.name))
         self.table = By_productTableWidget(product, parent=self,
                                            main_date=self.main_date)
 
@@ -69,7 +71,8 @@ class By_productTableWidget(FTableWidget):
     def set_data_for(self, main_date):
 
         try:
-            on, end = main_date.current.current[0], main_date.current.current[1]
+            on, end = main_date.current.current[
+                0], main_date.current.current[1]
         except:
             on, end = main_date.current[0], main_date.current[1]
 
@@ -82,23 +85,28 @@ class By_productTableWidget(FTableWidget):
         for rept in period_report.group_by("store").order_by(Reports.date.desc()):
             dict = {}
             reports_stores = period_report.filter(store=rept.store)
-            sum_qty_in = reports_stores.filter(type_=Reports.E).aggregate(peewee.Sum('qty_use'))
-            sum_qty_out = reports_stores.filter(type_=Reports.S).aggregate(peewee.Sum('qty_use'))
+            sum_qty_in = reports_stores.filter(
+                type_=Reports.E).aggregate(peewee.Sum('qty_use'))
+            sum_qty_out = reports_stores.filter(
+                type_=Reports.S).aggregate(peewee.Sum('qty_use'))
 
             dict["store"] = rept.store.name
             dict["sum_qty_in"] = sum_qty_in if sum_qty_in else 0
             dict["sum_qty_out"] = sum_qty_out if sum_qty_out else 0
-            dict["sum_nbr_part_in"] = rept.product.number_parts_box * dict["sum_qty_in"]
-            dict["sum_nbr_part_out"] = rept.product.number_parts_box * dict["sum_qty_out"]
+            dict["sum_nbr_part_in"] = rept.product.number_parts_box * \
+                dict["sum_qty_in"]
+            dict["sum_nbr_part_out"] = rept.product.number_parts_box * \
+                dict["sum_qty_out"]
             try:
-                dict["remaining"] = reports_stores.order_by(('.date', 'desc')).get().remaining
+                dict["remaining"] = reports_stores.order_by(
+                    ('.date', 'desc')).get().remaining
                 reports.append(dict)
             except:
                 raise
                 # pass
         self.data = [(rep.get('store'), rep.get('sum_qty_in'), rep.get('sum_qty_out'),
                       rep.get('remaining'))
-                      for rep in reports]
+                     for rep in reports]
 
     def extend_rows(self):
 

@@ -148,7 +148,7 @@ msgstr ""
 msgid "Les stocks actual"
 msgstr ""
 
-#. self.table_statis = F_BoxTitle(_(u"Les Statistiques"))
+#. self.table_statis = FBoxTitle(_(u"Les Statistiques"))
 #. self.table_statis = StatisTableWidget(parent=self)
 #. table_statis.addWidget(self.table_statis)
 #. table_statis.addWidget(self.table_statis)

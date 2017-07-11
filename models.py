@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from Common import peewee
+import peewee
 from GCommon.models import (BaseModel, SettingsAdmin, Version, FileJoin, Organization,
                             Owner, Category, Store)
 
@@ -25,7 +25,7 @@ class Store(Store):
 
         try:
             return Reports.select().where(Reports.store == self)
-        except Common.peewee.ReportsDoesNotExist as e:
+        except peewee.ReportsDoesNotExist as e:
             print("get_reports ", e)
 
     def get_report_or_none(self):

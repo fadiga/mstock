@@ -4,9 +4,9 @@
 ; -------------------------------
 ; Start
 
-  !define MUI_PRODUCT "MStock"
-  !define MUI_FILE "mmain"
-  !define MUI_VERSION "Ver. 4.0.2"
+  !define MUI_PRODUCT "Mstock"
+  !define MUI_FILE "main"
+  !define MUI_VERSION "V.5.0"
   !define MUI_BRANDINGTEXT "${MUI_PRODUCT} ${MUI_VERSION}"
   !define IMAGES "images"
   !define CIMAGES "cimages"
@@ -55,9 +55,7 @@ Section "install"
 
   ; List of files/folders to copy
   File /r dist\*.*
-  File /r *.dll
-  File /r *.manifest
-  File /r fact_source.pdf
+  File ressources\*.dll
   File /r ${IMAGES}
   File /r ${CIMAGES_PATH}
 
@@ -91,7 +89,6 @@ Section "Uninstall"
 # now delete installed file
 delete $INSTDIR\*.exe
 delete $INSTDIR\*.dll
-delete $INSTDIR\*.manifest
 delete $INSTDIR\*.lib
 delete $INSTDIR\*.zip
 delete $INSTDIR\*.pdf
@@ -119,7 +116,7 @@ Function .onInstSuccess
   ;MessageBox MB_OK "Vous avez installé le ${MUI_PRODUCT}.Utilise son icon sur le ;bureau pour lancer le program."
 
    SetOutPath $INSTDIR
-   ExecShell "" '"$INSTDIR\mmain.exe"'
+   ExecShell "" '"$INSTDIR\${MUI_FILE}.exe"'
 FunctionEnd
 
 Function un.onUninstSuccess

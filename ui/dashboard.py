@@ -188,7 +188,7 @@ class InvoiceTableWidget(FTableWidget):
             return
         try:
             self.parent.change_main_context(ShowInvoiceViewWidget,
-                                            invoice=Invoice.get(number=(self.data[row][1])))
+                                            table_p=self, invoice=Invoice.get(number=(self.data[row][1])))
         except IndexError:
             pass
 

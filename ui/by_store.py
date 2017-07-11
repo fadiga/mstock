@@ -4,7 +4,7 @@
 
 from datetime import datetime
 
-from Common import peewee
+import peewee
 from PyQt4.QtGui import (QVBoxLayout, QTableWidgetItem)
 from PyQt4.QtCore import Qt
 
@@ -19,13 +19,14 @@ class By_storeViewWidget(FWidget, FPeriodHolder):
 
     def __init__(self, store, parent=0, *args, **kwargs):
 
-        super(By_storeViewWidget, self).__init__(parent=parent, *args, **kwargs)
+        super(By_storeViewWidget, self).__init__(
+            parent=parent, *args, **kwargs)
         FPeriodHolder.__init__(self, *args, **kwargs)
 
         self.setWindowTitle("Par store")
         store = Store.filter(name__icontains=store).get()
-        self.title = FPageTitle(u"Les rapports de stock pour: %s"%
-                                                            store.name)
+        self.title = FPageTitle(u"Les rapports de stock pour: %s" %
+                                store.name)
         self.table = By_storeTableWidget(store, parent=self,
                                          main_date=self.main_date)
 
@@ -68,7 +69,8 @@ class By_storeTableWidget(FTableWidget):
     def set_data_for(self, main_date):
 
         try:
-            on, end = main_date.current.current[0], main_date.current.current[1]
+            on, end = main_date.current.current[
+                0], main_date.current.current[1]
         except:
             on, end = main_date.current[0], main_date.current[1]
 
@@ -80,23 +82,28 @@ class By_storeTableWidget(FTableWidget):
             dict = {}
             prod_rept = rept.product
             report = period_report.filter(product=prod_rept)
-            sum_qty_in = report.filter(type_=Reports.E).aggregate(peewee.Sum('qty_use'))
-            sum_qty_out = report.filter(type_=Reports.S).aggregate(peewee.Sum('qty_use'))
+            sum_qty_in = report.filter(
+                type_=Reports.E).aggregate(peewee.Sum('qty_use'))
+            sum_qty_out = report.filter(
+                type_=Reports.S).aggregate(peewee.Sum('qty_use'))
 
             dict["product"] = prod_rept.name
             dict["sum_qty_in"] = sum_qty_in if sum_qty_in else 0
             dict["sum_qty_out"] = sum_qty_out if sum_qty_out else 0
-            dict["sum_nbr_part_in"] = prod_rept.number_parts_box * dict["sum_qty_in"]
-            dict["sum_nbr_part_out"] = prod_rept.number_parts_box * dict["sum_qty_out"]
+            dict["sum_nbr_part_in"] = prod_rept.number_parts_box * \
+                dict["sum_qty_in"]
+            dict["sum_nbr_part_out"] = prod_rept.number_parts_box * \
+                dict["sum_qty_out"]
             try:
-                dict["remaining"] = report.order_by(('.date', 'desc')).get().remaining
+                dict["remaining"] = report.order_by(
+                    ('.date', 'desc')).get().remaining
                 reports.append(dict)
             except:
                 raise
                 # pass
         self.data = [(rep.get('product'), rep.get('sum_qty_in'), rep.get('sum_qty_out'),
                       rep.get('remaining'))
-                      for rep in reports]
+                     for rep in reports]
 
     def click_item(self, row, column, *args):
         product_column = 0

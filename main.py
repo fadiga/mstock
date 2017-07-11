@@ -18,7 +18,7 @@ from PyQt4.QtGui import QApplication
 from database import setup
 from Common.ui.window import FWindow
 from Common.cmain import cmain
-from Common.ui.cstyle import CSS
+from Common.ui.qss import appStyle
 
 from ui.mainwindow import MainWindow
 
@@ -32,7 +32,7 @@ def main():
     # gettext.install('mmain', localedir='locale', unicode=True)
     gettext.install('mmain.py', localedir='locale')
     window = MainWindow()
-    window.setStyleSheet(CSS.appStyle)
+    window.setStyleSheet(appStyle)
     setattr(FWindow, 'window', window)
     window.show()
     # window.showMaximized()

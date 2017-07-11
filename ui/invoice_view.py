@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-#maintainer: Fad
+# maintainer: Fad
 
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel, QTableWidgetItem,
@@ -31,15 +31,18 @@ class InvoiceViewWidget(FWidget):
 
         self.num_invoice = IntLineEdit("%d" % (Invoice.select().count() + 1))
         self.num_invoice.setToolTip(u"Le numéro de la facture")
-        self.num_invoice.setMaximumSize(40, self.num_invoice.maximumSize().height())
+        self.num_invoice.setMaximumSize(
+            40, self.num_invoice.maximumSize().height())
         self.num_invoice_error = ErrorLabel("")
         self.invoice_date = FormatDate(QDate.currentDate())
         self.name_client = QLineEdit()
-        self.name_client.setMaximumSize(200, self.name_client.maximumSize().height())
+        self.name_client.setMaximumSize(
+            200, self.name_client.maximumSize().height())
         self.name_client.setToolTip("Taper le nom du client")
         self.name_client_error = ErrorLabel("")
         self.search_field = QLineEdit()
-        self.search_field.setMaximumSize(200, self.search_field.maximumSize().height())
+        self.search_field.setMaximumSize(
+            200, self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
         self.vline = QFrame()
@@ -115,9 +118,11 @@ class InvoiceViewWidget(FWidget):
             self.num_invoice_error.setText(u"")
         except:
             self.pixmap = QPixmap(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="warning.png"))
-            self.num_invoice.setStyleSheet("background-color:  rgb(255, 235, 235);")
-            self.num_invoice_error.setToolTip(u"Le numero de facture est obligatoire.")
+                                                             img="warning.png"))
+            self.num_invoice.setStyleSheet(
+                "background-color:  rgb(255, 235, 235);")
+            self.num_invoice_error.setToolTip(
+                u"Le numero de facture est obligatoire.")
             self.num_invoice_error.setPixmap(self.pixmap)
         invoice_date = str(self.invoice_date.text())
         name_client = str(self.name_client.text())
@@ -125,10 +130,12 @@ class InvoiceViewWidget(FWidget):
 
         values_t = self.table_invoice.get_table_items()
         if name_client == "":
-            self.name_client.setStyleSheet("background-color: rgb(255, 235, 235);")
+            self.name_client.setStyleSheet(
+                "background-color: rgb(255, 235, 235);")
             self.pixmap = QPixmap(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="decline.png"))
-            self.name_client_error.setToolTip(u"Nom du client est obligatoire.")
+                                                             img="decline.png"))
+            self.name_client_error.setToolTip(
+                u"Nom du client est obligatoire.")
             self.name_client_error.setPixmap(self.pixmap)
             return False
         # if num_invoice > Config.credit:
@@ -154,7 +161,8 @@ class InvoiceViewWidget(FWidget):
         try:
             invoice.save()
         except:
-            raise_error("Erreur", u"Impossible d'enregistrer l'entête de la facture")
+            raise_error(
+                "Erreur", u"Impossible d'enregistrer l'entête de la facture")
             return False
 
         # Save orderitems
@@ -181,12 +189,13 @@ class InvoiceViewWidget(FWidget):
                                       u"enregistré dans les rapports")
                 return False
 
-        self.change_main_context(ShowInvoiceViewWidget,
-                                        invoice=invoice)
+        self.change_main_context(ShowInvoiceViewWidget, table_p=self,
+                                 invoice=invoice)
 
 
 class ResultatTableWidget(FTableWidget):
     """docstring for ResultatTableWidget"""
+
     def __init__(self, parent, *args, **kwargs):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
@@ -218,14 +227,13 @@ class ResultatTableWidget(FTableWidget):
 
         self.data = [("", prod.name, "") for prod in products]
 
-
     def _item_for_data(self, row, column, data, context=None):
         if column == 2:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="go-next.png")), "Ajouter")
+                                                                     img="go-next.png")), "Ajouter")
         if column == 0:
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                      img="info.png")), "")
+                                                                     img="info.png")), "")
         return super(ResultatTableWidget, self)._item_for_data(row, column,
                                                                data, context)
 
@@ -273,7 +281,8 @@ class InfoTableWidget(FWidget):
 
         self.prod = Product.get(id=idd)
         self.nameLabel.setText((u"<h4>Article:</h4>"))
-        self.name.setText(u"<h6>{name}</h6>".format(name=self.prod.name.title()))
+        self.name.setText(
+            u"<h6>{name}</h6>".format(name=self.prod.name.title()))
         rest_by_store = ""
 
         for store in Store.select():
@@ -311,7 +320,8 @@ class InfoTableWidget(FWidget):
         """ doit afficher l'image complete dans une autre fenetre"""
         from GCommon.ui.show_image import ShowImageViewWidget
         try:
-            self.parent.open_dialog(ShowImageViewWidget, modal=True, prod=self.prod)
+            self.parent.open_dialog(
+                ShowImageViewWidget, modal=True, prod=self.prod)
         except AttributeError:
             pass
 
@@ -424,7 +434,7 @@ class OrderTableWidget(FTableWidget):
         mtt_ht = 0
         for row_num in xrange(0, self.data.__len__()):
             last_report = Product.filter(name=str(self.item(row_num, 1)
-                                         .text())).get().last_report
+                                                  .text())).get().last_report
             try:
                 qtremaining = last_report.remaining
             except AttributeError:

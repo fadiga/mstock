@@ -6,7 +6,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
 from models import InvoiceItem
-from Common.cel import cel
+# from Common.cel import cel
+from num2words import num2words
 from configuration import Config
 from Common.ui.util import get_temp_filename
 
@@ -83,7 +84,7 @@ def pdFview(filename, invoice):
             montant = i.price * i.quantity
             ht += montant
 
-        ht_en_lettre = cel(ht)
+        ht_en_lettre = num2words(ht)
 
         p.drawString(470, 150, str(ht).rjust(10, ' '))
         ht_en_lettre1, ht_en_lettre2 = controle_caratere(ht_en_lettre +

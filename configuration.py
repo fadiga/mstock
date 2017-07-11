@@ -4,18 +4,20 @@
 # maintainer: Fad
 from __future__ import (unicode_literals, absolute_import, division,
                         print_function)
+import os
+# from static import Constants
+from Common.cstatic import CConstants
 
-from static import Constants
-from Common import peewee
+ROOT_DIR = os.path.dirname(os.path.abspath('__file__'))
 
 
-class Config(Constants):
+class Config(CConstants):
 
     """ docstring for Config
                             """
 
     def __init__(self):
-        Constants.__init__(self)
+        CConstants.__init__(self)
 
     # ------------------------- Organisation --------------------------#
 
@@ -34,11 +36,32 @@ class Config(Constants):
         BP = sttg.bp
         EMAIL_ORGA = sttg.email_org
         # DEBUG = True
-    except peewee.OperationalError:
-        pass
-
+    except Exception as e:
+        print(e)
     # DEBUG = True
     # DEBUG = False
+
+    # des_image_record = "static/img_prod"
+    ARMOIRE = "img_prod"
+    des_image_record = os.path.join(ROOT_DIR, ARMOIRE)
+    PEEWEE_V = 224
+    credit = 17
+    tolerance = 50
+    nb_warning = 5
+    ORG_LOGO = None
+
+    # -------- Application -----------#
+
+    NAME_MAIN = "main.py"
+
+    pdf_source = "pdf_source.pdf"
+    APP_NAME = "M. Stock"
+
+    APP_VERSION = u"1.0"
+    APP_DATE = u"03/2017"
+    img_media = os.path.join(os.path.join(ROOT_DIR, "static"), "images/")
+    APP_LOGO = os.path.join(img_media, "logo.png")
+    APP_LOGO_ICO = os.path.join(img_media, "logo.ico")
 
     # # ------------------------- Organisation --------------------------#
 

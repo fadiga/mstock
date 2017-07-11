@@ -12,7 +12,7 @@ from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
 from database import Reports, Product
 from Common.ui.table import FTableWidget
 from Common.ui.util import formatted_number, is_int, date_on_or_end
-from Common.exports_xls import export_dynamic_data
+from Common.exports_xlsx import export_dynamic_data
 
 
 class InventoryViewWidget(FWidget):

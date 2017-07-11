@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # maintainer: Fad
-from Common import peewee
+import peewee
 from datetime import datetime
 from PyQt4 import QtGui, QtCore
 

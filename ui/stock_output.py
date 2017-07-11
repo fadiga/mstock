@@ -13,7 +13,7 @@ from Common.ui.common import (FWidget, IntLineEdit, Button_menu,
                               FormLabel, FormatDate)
 from Common.ui.util import raise_error, is_int, date_to_datetime, date_on_or_end
 from Common.ui.table import FTableWidget
-from Common.peewee import fn
+from peewee import fn
 
 from ui.reports_managers import GReportViewWidget
 from GCommon.ui._product_detail import InfoTableWidget
