@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 # maintainer: fad
 
-from PyQt4.QtGui import (QMessageBox, QMenuBar, QIcon, QAction)
-from PyQt4.QtCore import SIGNAL, SLOT
+from PyQt4.QtGui import (QIcon, QAction)
+from PyQt4.QtCore import SIGNAL
 
 from configuration import Config
 from Common.ui.common import FWidget
 # from Common.ui.login import LoginWidget
-from Common.exports import export_database_as_file
+# from Common.exports import export_database_as_file
 
 from GCommon.ui.stores import StoresViewWidget
 from GCommon.ui.products import ProductsViewWidget
@@ -17,12 +17,11 @@ from ui.invoice_view import InvoiceViewWidget
 from ui.inventory import InventoryViewWidget
 from ui.state_stock import StateStockViewWidget
 from ui.order_view import OrderViewWidget
-from ui.invoice_view import InvoiceViewWidget
 from ui.dashboard import DashbordViewWidget
 from ui.stock_input import StockInputWidget
 from ui.stock_output import StockOutputWidget
 from ui.reports_managers import GReportViewWidget
-from ui.helps import HTMLView
+# from ui.helps import HTMLView
 
 from Common.ui.cmenubar import FMenuBar
 
@@ -36,11 +35,11 @@ class MenuBar(FMenuBar, FWidget):
         self.parent = parent
 
         menu = [{"name": u"Tableau de bord", "icon": 'dashboard', "admin": False, "shortcut": "Ctrl+T", "goto": DashbordViewWidget},
-                {"name": u"Articles", "admin": True,  "icon": 'product',
+                {"name": u"Articles", "admin": True, "icon": 'product',
                     "shortcut": "Ctrl+P", "goto": ProductsViewWidget},
-                {"name": u"Commande", "admin": True,  "icon": 'order',
+                {"name": u"Commande", "admin": True, "icon": 'order',
                     "shortcut": "Ctrl+O", "goto": OrderViewWidget},
-                {"name": u"Inventaire", "admin": True,  "icon": 'inventory',
+                {"name": u"Inventaire", "admin": True, "icon": 'inventory',
                     "shortcut": "Ctrl+I", "goto": InventoryViewWidget},
                 {"name": u"Entrée", "icon": 'in', "admin": False,
                     "shortcut": "Ctrl+E", "goto": StockInputWidget},

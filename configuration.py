@@ -62,7 +62,7 @@ class Config(CConstants):
     img_media = os.path.join(os.path.join(ROOT_DIR, "static"), "images/")
     APP_LOGO = os.path.join(img_media, "logo.png")
     APP_LOGO_ICO = os.path.join(img_media, "logo.ico")
-
+    DOC_SUPPORT = "*.png *.jpg *.bmp"
     # # ------------------------- Organisation --------------------------#
 
     # NAME_ORGA = u"BOUTIQUE ULTIMO"

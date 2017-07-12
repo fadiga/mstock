@@ -12,10 +12,12 @@ from configuration import Config
 from Common.ui.common import FWidget
 
 from GCommon.ui.products import ProductsViewWidget
+from GCommon.ui.stores import StoresViewWidget
 
 from ui.state_stock import StateStockViewWidget
 from ui.dashboard import DashbordViewWidget
-from ui.reports_managers import GReportViewWidget
+# from ui.reports_managers import GReportViewWidget
+from ui.invoice_view import InvoiceViewWidget
 from ui.inventory import InventoryViewWidget
 from ui.stock_input import StockInputWidget
 from ui.order_view import OrderViewWidget
@@ -41,9 +43,11 @@ class MenuToolBar(QToolBar, FWidget):
         # Menu File
         self.setOrientation(Qt.Horizontal)
         self.addAction(
-            QIcon(u"{}exit.png".format(Config.img_cmedia)), u"Quiter", self.goto_exit)
+            QIcon(u"{}exit.png".format(Config.img_cmedia)),
+            u"Quiter", self.goto_exit)
         # self.addSeparator()
-        menu = [{"name": u"Tableau de bord", "icon": 'dashboard', "admin": False, "goto": DashbordViewWidget},
+        menu = [{"name": u"Tableau de bord", "icon": 'dashboard',
+                 "admin": False, "goto": DashbordViewWidget},
                 {"name": u"Entrée", "icon": 'in',
                     "admin": False, "goto": StockInputWidget},
                 {"name": u"Sortie", "icon": 'out',
@@ -54,7 +58,12 @@ class MenuToolBar(QToolBar, FWidget):
                     "admin": False, "goto": StateStockViewWidget},
                 {"name": u"Articles", "admin": True,
                     "icon": 'product', "goto": ProductsViewWidget},
-                {"name": u"Inventaire", "icon": 'inventory', "admin": False, "goto": InventoryViewWidget}, ]
+                {"name": u"Magasin", "icon": 'store', "admin": False,
+                    "shortcut": "Ctrl+M", "goto": StoresViewWidget},
+                {"name": u"Facturation", "icon": 'invoice', "admin": False,
+                    "shortcut": "Ctrl+", "goto": InvoiceViewWidget},
+                {"name": u"Inventaire", "icon": 'inventory',
+                 "admin": False, "goto": InventoryViewWidget}, ]
 
         for m in menu:
             self.addSeparator()

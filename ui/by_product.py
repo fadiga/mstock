@@ -17,11 +17,13 @@ from Common.ui.util import formatted_number, is_int
 
 class By_productViewWidget(FWidget, FPeriodHolder):
 
-    def __init__(self, product, parent=0, *args, **kwargs):
+    def __init__(self, table_p, product, parent=0, *args, **kwargs):
 
         super(By_productViewWidget, self).__init__(
             parent=parent, *args, **kwargs)
         FPeriodHolder.__init__(self, *args, **kwargs)
+
+        self.table_p = table_p
 
         self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      Par product")
 
@@ -86,9 +88,9 @@ class By_productTableWidget(FTableWidget):
             dict = {}
             reports_stores = period_report.filter(store=rept.store)
             sum_qty_in = reports_stores.filter(
-                type_=Reports.E).aggregate(peewee.Sum('qty_use'))
+                type_=Reports.E).aggregate(peewee.fn.Sum('qty_use'))
             sum_qty_out = reports_stores.filter(
-                type_=Reports.S).aggregate(peewee.Sum('qty_use'))
+                type_=Reports.S).aggregate(peewee.fn.Sum('qty_use'))
 
             dict["store"] = rept.store.name
             dict["sum_qty_in"] = sum_qty_in if sum_qty_in else 0
@@ -99,11 +101,11 @@ class By_productTableWidget(FTableWidget):
                 dict["sum_qty_out"]
             try:
                 dict["remaining"] = reports_stores.order_by(
-                    ('.date', 'desc')).get().remaining
+                    ('date', 'desc')).get().remaining
                 reports.append(dict)
             except:
-                raise
-                # pass
+                # raise
+                pass
         self.data = [(rep.get('store'), rep.get('sum_qty_in'), rep.get('sum_qty_out'),
                       rep.get('remaining'))
                      for rep in reports]

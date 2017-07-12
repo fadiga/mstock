@@ -106,14 +106,14 @@ main_app = Target(
 
 
 py2exe_options = dict(
-    # packages=['reportlab'],
-    ##    ignores = "dotblas gnosis.xml.pickle.parsers._cexpat mx.DateTime".split(),
+    packages=['reportlab'],
+    # ignores = "dotblas gnosis.xml.pickle.parsers._cexpat mx.DateTime".split(),
     # dll_excludes = "MSVCP90.dll mswsock.dll powrprof.dll".split(),
-    includes=['sip', 'PyQt4'],
+    includes=['sip', 'PyQt4', 'ui'],
     excludes=['tkinter', 'toFspecials'],
     optimize=2,
     compressed=True,  # uncompressed may or may not have a faster startup
-    bundle_files=1,
+    bundle_files=2,
     dist_dir='dist',
 )
 

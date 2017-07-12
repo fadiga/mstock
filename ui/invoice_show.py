@@ -4,25 +4,23 @@
 from __future__ import (
     unicode_literals, absolute_import, division, print_function)
 
-
-from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
-                         QIcon, QGridLayout, QSplitter, QFrame, QMessageBox,
-                         QPushButton, QMenu, QCompleter, QPixmap)
+from PyQt4.QtGui import (QVBoxLayout, QTableWidgetItem,
+                         QIcon, QGridLayout, QMessageBox, QPushButton)
 from PyQt4.QtCore import Qt
 
 from configuration import Config
-from models import Invoice, Reports
+from models import Reports
 from tools.export_pdf import pdFview
 from tools.export_xls import write_invoice_xls
 from Common.ui.util import formatted_number, is_int, uopen_file
 from Common.ui.common import (
-    FWidget, FPageTitle, FLabel, LineEdit, Deleted_btt)
+    FWidget, FPageTitle, FLabel, Deleted_btt)
 from Common.ui.table import FTableWidget
 
 
 class ShowInvoiceViewWidget(FWidget):
 
-    def __init__(self, invoice, parent=0, *args, **kwargs):
+    def __init__(self, table_p, invoice, parent=0, *args, **kwargs):
         super(ShowInvoiceViewWidget, self).__init__(
             parent=parent, *args, **kwargs)
 
@@ -31,6 +29,7 @@ class ShowInvoiceViewWidget(FWidget):
         self.parentWidget().setWindowTitle(Config.NAME_ORGA +
                                            u" CONSULTATION DE FACTURE")
 
+        self.table_p = table_p
         self.parent = parent
 
         vbox = QVBoxLayout()
@@ -42,10 +41,10 @@ class ShowInvoiceViewWidget(FWidget):
 
         formbox = QVBoxLayout()
         editbox = QGridLayout()
-        xls_bicon = QIcon.fromTheme('',
-                                    QIcon(u"{}xls.png".format(Config.img_cmedia)))
-        pdFicon = QIcon.fromTheme('',
-                                  QIcon(u"{}pdf.png".format(Config.img_cmedia)))
+        xls_bicon = QIcon.fromTheme(
+            '', QIcon(u"{}xls.png".format(Config.img_cmedia)))
+        pdFicon = QIcon.fromTheme(
+            '', QIcon(u"{}pdf.png".format(Config.img_cmedia)))
         self.button_pdf = QPushButton(pdFicon, u"")
         self.button_pdf.setFixedWidth(30)
         self.button_pdf.setFixedHeight(30)
@@ -57,8 +56,8 @@ class ShowInvoiceViewWidget(FWidget):
 
         editbox.addWidget(FLabel(u"Facture N°: %s"
                                  % self.invoice.number), 0, 0)
-        editbox.addWidget(FLabel(u"%s le %s" % (self.invoice.location,
-                                                self.invoice.date.strftime(u'%x'))), 1, 4)
+        editbox.addWidget(FLabel(u"%s le %s" % (
+            self.invoice.location, self.invoice.date.strftime(u'%x'))), 1, 4)
         editbox.addWidget(FLabel(u"Doit: %s " % self.invoice.client), 1, 0)
         editbox.addWidget(self.button_pdf, 1, 5)
         editbox.addWidget(self.button_xls, 1, 6)
@@ -76,10 +75,10 @@ class ShowInvoiceViewWidget(FWidget):
         uopen_file(pdFreport)
 
     def annulation(self):
-        reply = QMessageBox.question(self, 'Confirmation',
-                                     u"<h2 style='color:red;'>Voulez vous vraiment annuler cette"
-                                     u" facture?</h2>",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(
+            self, 'Confirmation', u"<h2 style='color:red;'>Voulez vous "
+            "vraiment annuler cette facture?</h2>",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             from ui.dashboard import DashbordViewWidget
@@ -98,8 +97,8 @@ class ShowInvoiceTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [_(u"Quantité"), _(u"Désignation"), _(u"Prix Unitaire"),
-                         _(u"Montant")]
+        self.hheaders = [_("Quantité"), _("Désignation"), _("Prix Unitaire"),
+                         _("Montant")]
         self.stretch_columns = [1, 3]
         self.align_map = {2: 'r', 3: 'r'}
         # self.max_rows = 100

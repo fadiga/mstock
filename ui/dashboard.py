@@ -91,7 +91,7 @@ class GReportTableWidget(FTableWidget):
         self.align_map = {3: "r", 4: "r"}
         self.sorter = True
         self.display_vheaders = False
-        self.display_fixed = True
+        # self.display_fixed = True
         self.refresh_()
 
     def refresh_(self):

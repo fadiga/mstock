@@ -17,8 +17,8 @@ from PyQt4.QtGui import QApplication
 
 from database import setup
 from Common.ui.window import FWindow
-from Common.cmain import cmain
 from Common.ui.qss import appStyle
+from Common.cmain import cmain
 
 from ui.mainwindow import MainWindow
 
@@ -30,12 +30,12 @@ def main():
     gettext_windows.setup_env()
     locale.setlocale(locale.LC_ALL, '')
     # gettext.install('mmain', localedir='locale', unicode=True)
-    gettext.install('mmain.py', localedir='locale')
+    gettext.install('main.py', localedir='locale')
     window = MainWindow()
     window.setStyleSheet(appStyle)
     setattr(FWindow, 'window', window)
-    window.show()
-    # window.showMaximized()
+    # window.show()
+    window.showMaximized()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

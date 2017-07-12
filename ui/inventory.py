@@ -8,7 +8,7 @@ from PyQt4 import QtGui, QtCore
 
 from configuration import Config
 from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
-                              BttSmall,  FormatDate, IntLineEdit)
+                              BttSmall, FormatDate)
 from database import Reports, Product
 from Common.ui.table import FTableWidget
 from Common.ui.util import formatted_number, is_int, date_on_or_end
@@ -20,6 +20,7 @@ class InventoryViewWidget(FWidget):
     def __init__(self, parent=0, *args, **kwargs):
         super(InventoryViewWidget, self).__init__(
             parent=parent, *args, **kwargs)
+
         self.parent = parent
 
         self.title = u"Inventaire des articles"
@@ -55,7 +56,8 @@ class InventoryViewWidget(FWidget):
     def rapport_filter(self):
         self.btt_export.setEnabled(True)
         self.invent_table.refresh_(on=date_on_or_end(self.on_date.text()),
-                                   end=date_on_or_end(self.end_date.text(), on=False))
+                                   end=date_on_or_end(self.end_date.text(),
+                                                      on=False))
 
     def export_xls(self):
         dict_data = {
@@ -79,8 +81,8 @@ class InventoryTableWidget(FTableWidget):
         self.parent = parent
         self.pparent = parent.parent
 
-        self.hheaders = [
-            u"Magasin", u"Code art.", u"Article", u"Quantité Restante"]
+        self.hheaders = [u"Magasin", u"Code art.", u"Article",
+                         u"Qtté Restante (Carton)", "Qtté (piéce)"]
         self.stretch_columns = [0, 1, 2, 3]
         self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r'}
         self.display_vheaders = True
@@ -93,29 +95,41 @@ class InventoryTableWidget(FTableWidget):
         self.set_data_for(on, end)
         self.refresh()
 
-    def set_data_for(self,  on, end):
+    def set_data_for(self, on, end):
 
         if on:
             reports = []
             for prod in Product.all():
                 try:
-                    reports.append(Reports.select().where(Reports.product == prod,
-                                                          Reports.date >= on,
-                                                          Reports.date <= end)
-                                   .order_by(Reports.date.desc())
-                                   .get())
+                    reports.append(Reports.select().where(
+                        Reports.product == prod, Reports.date >= on,
+                        Reports.date <= end).order_by(Reports.date.desc())
+                        .get())
                 except:
                     pass
-            self.data = [(rep.store.name, rep.product.code, rep.product.name, rep.remaining)
+            self.data = [(rep.store.name, rep.product.code, rep.product.name,
+                          rep.remaining, rep.remaining * rep.product.number_parts_box)
                          for rep in reports]
 
     def _item_for_data(self, row, column, data, context=None):
+
         # if column == 2:
         #     line_edit = IntLineEdit("")
         #     line_edit.textChanged.connect(self.changed_value)
         #     return line_edit
         return super(InventoryTableWidget, self)._item_for_data(row, column,
                                                                 data, context)
+
+    def click_item(self, row, column, *args):
+        from ui.by_product import By_productViewWidget
+        if column == 1:
+            try:
+                # print("UUUUUUU", self.data[row][1])
+                self.parent.change_main_context(
+                    By_productViewWidget, table_p=self,
+                    product=Product.get(code=self.data[row][1]))
+            except IndexError:
+                pass
 
     def changed_value(self, refresh=False):
 
