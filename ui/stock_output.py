@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
-from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel, QTableWidgetItem,
+from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
-                         QPushButton, QMenu, QCompleter, QComboBox)
-from PyQt4.QtCore import QDate, Qt, QVariant, SIGNAL
+                         QPushButton, QMenu, QComboBox)
+from PyQt4.QtCore import QDate, Qt, SIGNAL
 
 
 from configuration import Config
-from Common.ui.common import (FWidget, IntLineEdit, Button_menu,
+from Common.ui.common import (FWidget, IntLineEdit,
                               FormLabel, FormatDate)
-from Common.ui.util import raise_error, is_int, date_to_datetime, date_on_or_end
+from Common.ui.util import is_int, date_to_datetime, date_on_or_end
 from Common.ui.table import FTableWidget
 from peewee import fn
 
@@ -189,71 +189,74 @@ class InproductTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [u"Quantité du product", u"Désignation"]
+        self.hheaders = [u"Quantité (carton)", "Nombre pièce", u"Désignation"]
 
         # self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
 
-        self.stretch_columns = [0, 1]
-        self.align_map = {1: "l", 2: "l"}
-        # self.ecart = 144
-        # self.display_vheaders = False
-        self.display_fixed = True
+        self.stretch_columns = [0, 1, 2]
+        self.align_map = {0: 'r', 1: 'r', 2: 'l'}
+        self.display_vheaders = False
+        # self.display_fixed = True
         self.refresh_()
+        # self.isvalid = True
+        self.col_dest = 2
+        self.col_qtty = 0
 
     def refresh_(self, choix=None):
         if choix:
-            self.row = [1, u"%s" % choix.name]
-            if not [row for row in self.data if self.row[1] in row]:
+            self.row = [1, choix.number_parts_box, choix.name]
+            if not [row for row in self.data if self.row[self.col_dest] in row]:
                 self.set_data_for()
                 self.refresh()
+            self.refresh()
 
     def set_data_for(self):
 
         self._reset()
         self.data.extend([self.row])
-        self.refresh()
+        self.refresh_()
+        pw = self.width() / 4 - 20
+        self.setColumnWidth(0, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, (pw * 2))
 
     def popup(self, pos):
         if (len(self.data) - 1) < self.selectionModel().selection().indexes()[0].row():
             return False
         menu = QMenu()
-        quitAction = menu.addAction("Supprimer cette ligne")
+        quit_action = menu.addAction("Supprimer cette ligne")
         action = menu.exec_(self.mapToGlobal(pos))
-        if action == quitAction:
+        if action == quit_action:
             try:
                 self.data.pop(self.selectionModel()
                                   .selection().indexes()[0].row())
             except IndexError:
                 pass
-            self.refresh()
+            self.refresh_()
 
     def extend_rows(self):
         nb_rows = self.rowCount()
 
         self.setRowCount(nb_rows + 1)
-        bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                                     img='save.png')))
+        bicon = QIcon.fromTheme(
+            '', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
+                                                 img='save.png')))
         self.button = QPushButton(bicon, u"Enrgistrer la sortie")
         self.button.released.connect(self.parent.save_report)
-        self.setCellWidget(nb_rows, 1, self.button)
-
-        # pw = (self.parentWidget().width()) / 3
-        # self.setColumnWidth(0, pw)
-        # self.setColumnWidth(1, (pw * 2) - 2)
+        self.setCellWidget(nb_rows, self.col_dest, self.button)
 
     def _item_for_data(self, row, column, data, context=None):
-        if column != 1 and column != 3:
+        if column == 0:
             self.line_edit = IntLineEdit(u"%s" % data)
             self.line_edit.textChanged.connect(self.changed_value)
             return self.line_edit
-        return super(InproductTableWidget, self)._item_for_data(row,
-                                                                column, data,
-                                                                context)
+        return super(InproductTableWidget, self)._item_for_data(
+            row, column, data, context)
 
     def _update_data(self, row_num, new_data):
-        self.data[row_num] = (new_data[0], self.data[row_num][1], new_data[0])
+        self.data[row_num] = (new_data[0], new_data[1], self.data[row_num][2])
 
     def get_table_items(self):
         """  """
@@ -262,8 +265,8 @@ class InproductTableWidget(FTableWidget):
             liste_item = []
             row_data = self.data[i]
             try:
-                liste_item.append(int(row_data[0]))
-                liste_item.append(str(row_data[1]))
+                liste_item.append(int(row_data[self.col_qtty]))
+                liste_item.append(str(row_data[self.col_dest]))
                 list_order.append(liste_item)
             except:
                 liste_item.append("")
@@ -275,49 +278,57 @@ class InproductTableWidget(FTableWidget):
         current_store = self.parent.liste_store[
             self.parent.box_store.currentIndex()]
 
+        self.button.setEnabled(True)
+        self.isvalid = True
         for row_num in xrange(0, self.data.__len__()):
-            self.isvalid = True
-            try:
-                last_report = Reports.filter(store=current_store,
-                                             product__name=str(self.item(row_num, 1)
-                                                               .text())).order_by(Reports.date.desc()).get()
-                qtremaining = last_report.remaining
+            qtsaisi = is_int(self.cellWidget(row_num, self.col_qtty).text())
 
+            nb_parts_box = Product.filter(
+                name=self.item(row_num, self.col_dest).text()).get(
+            ).number_parts_box * qtsaisi
+
+            self.setItem(row_num, 1, QTableWidgetItem(
+                "{}".format(nb_parts_box)))
+
+            self._update_data(row_num, [qtsaisi, nb_parts_box])
+
+            try:
+                last_report = Reports.filter(
+                    store=current_store, product__name=str(
+                        self.item(row_num, self.col_dest).text())).order_by(
+                    Reports.date.desc()).get()
+                qtremaining = last_report.remaining
                 date_out = str(self.parent.date_out.text())
                 if last_report.date > date_on_or_end(date_out, on=False):
                     self.parent.date_out.setStyleSheet("font-size:15px;"
                                                        "color:red")
-                    self.parent.date_out.setToolTip(u"Cette date est "
-                                                    u"Inférieure à la date "
-                                                    u"de la dernière rapport"
-                                                    u" (%s) " %
-                                                    last_report.date)
+                    self.parent.date_out.setToolTip(
+                        "Cette date est Inférieure à la date de la dernière rapport ({}).".format(last_report.date))
                     self.isvalid = False
-                    return False
+                    self.button.setEnabled(False)
+                    # return False
 
             except Exception as e:
-                print(e)
                 qtremaining = 0
 
-            qtsaisi = is_int(self.cellWidget(row_num, 0).text())
-
-            self._update_data(row_num, [qtsaisi])
             viderreur_qtsaisi = ""
             stylerreur = "background-color: rgb(255, 235, 235);" + \
                          "border: 3px double SeaGreen"
             if qtsaisi == 0:
                 viderreur_qtsaisi = stylerreur
-                self.cellWidget(row_num, 0).setToolTip(u"obligatoire")
+                self.cellWidget(row_num, self.col_qtty).setToolTip(
+                    u"obligatoire")
                 self.isvalid = False
+                self.button.setEnabled(False)
 
-            self.cellWidget(row_num, 0).setStyleSheet(viderreur_qtsaisi)
+            self.cellWidget(row_num, self.col_qtty).setStyleSheet(
+                viderreur_qtsaisi)
 
-            self.cellWidget(row_num, 0).setToolTip("")
+            self.cellWidget(row_num, self.col_qtty).setToolTip("")
             if qtremaining < qtsaisi:
-                self.cellWidget(row_num, 0).setStyleSheet("font-size:20px;"
-                                                          " color: red")
-                self.cellWidget(row_num, 0).setToolTip(u"%s est > %s (stock"
-                                                       u" remaining)" % (qtsaisi,
-                                                                         qtremaining))
+                self.cellWidget(row_num, self.col_qtty).setStyleSheet(
+                    "font-size:20px; color: red")
+                self.cellWidget(row_num, self.col_qtty).setToolTip(
+                    u"{} est > {} la quantité restante.".format(qtsaisi, qtremaining))
                 self.isvalid = False
-                return False
+                # self.button.setEnabled(False)

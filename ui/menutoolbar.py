@@ -22,6 +22,8 @@ from ui.inventory import InventoryViewWidget
 from ui.stock_input import StockInputWidget
 from ui.order_view import OrderViewWidget
 from ui.stock_output import StockOutputWidget
+from ui.reports_managers import GReportViewWidget
+from ui.report_product_store import ReportProductStoreWidget
 
 
 class MenuToolBar(QToolBar, FWidget):
@@ -48,22 +50,26 @@ class MenuToolBar(QToolBar, FWidget):
         # self.addSeparator()
         menu = [{"name": u"Tableau de bord", "icon": 'dashboard',
                  "admin": False, "goto": DashbordViewWidget},
+                {"name": u"Magasin", "icon": 'store', "admin": False,
+                    "shortcut": "Ctrl+M", "goto": StoresViewWidget},
+                {"name": u"Articles", "admin": True,
+                    "icon": 'product', "goto": ProductsViewWidget},
                 {"name": u"Entrée", "icon": 'in',
                     "admin": False, "goto": StockInputWidget},
                 {"name": u"Sortie", "icon": 'out',
                     "admin": True, "goto": StockOutputWidget},
+                {"name": u"Facturation", "icon": 'invoice', "admin": False,
+                    "shortcut": "Ctrl+", "goto": InvoiceViewWidget},
                 {"name": u"Commande", "admin": True,
                     "icon": 'order', "goto": OrderViewWidget},
                 {"name": u"State", "icon": 'state',
                     "admin": False, "goto": StateStockViewWidget},
-                {"name": u"Articles", "admin": True,
-                    "icon": 'product', "goto": ProductsViewWidget},
-                {"name": u"Magasin", "icon": 'store', "admin": False,
-                    "shortcut": "Ctrl+M", "goto": StoresViewWidget},
-                {"name": u"Facturation", "icon": 'invoice', "admin": False,
-                    "shortcut": "Ctrl+", "goto": InvoiceViewWidget},
                 {"name": u"Inventaire", "icon": 'inventory',
-                 "admin": False, "goto": InventoryViewWidget}, ]
+                 "admin": False, "goto": InventoryViewWidget},
+                {"name": u"Situation du stock", "icon": '', "admin": False,
+                    "shortcut": "ctrl+D", "goto": ReportProductStoreWidget},
+                {"name": u"Mouvements", "icon": 'reports', "admin": False,
+                    "shortcut": "alt+T", "goto": GReportViewWidget}]
 
         for m in menu:
             self.addSeparator()

@@ -19,7 +19,7 @@ class InfoTableWidget(FWidget):
         self.refresh()
         self.info_box = FLabel(" ")
         self.image = FLabel(" ")
-        self.image_btt = BttSmall("Zoom")
+        self.image_btt = BttSmall("EZoom")
         self.image_btt.setFlat(True)
         self.image_btt.clicked.connect(self.show_image)
 
@@ -27,7 +27,7 @@ class InfoTableWidget(FWidget):
         gridbox = QGridLayout()
         gridbox.addWidget(self.info_box, 0, 0)
         gridbox.addWidget(self.image, 1, 0)
-        gridbox.addWidget(self.image_btt, 1, 1)
+        # gridbox.addWidget(self.image_btt, 0, 1)
         hbox.addLayout(gridbox)
         self.setLayout(hbox)
 

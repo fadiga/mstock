@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
-from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QLabel, QTableWidgetItem,
+from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
-                         QMenu, QCompleter, QComboBox, QPushButton)
-from PyQt4.QtCore import QDate, Qt, QVariant
+                         QMenu, QComboBox, QPushButton)
+from PyQt4.QtCore import QDate, Qt
 
 from configuration import Config
 from models import (Store, Product, Reports)
 
 from Common.ui.common import (FWidget, IntLineEdit, FormLabel, FormatDate,
                               Button)
-from Common.ui.util import is_int, date_to_datetime
+from Common.ui.util import is_int, date_to_datetime, formatted_number
 from Common.ui.table import FTableWidget
 
 from ui.reports_managers import GReportViewWidget
@@ -24,8 +24,7 @@ class StockInputWidget(FWidget):
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
         title = u"   ENTREE STOCK"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA +
-                                           title)
+        self.parentWidget().setWindowTitle(Config.NAME_ORGA + title)
         Config.logging.info(title)
         self.parent = parent
 
@@ -172,16 +171,18 @@ class ResultatTableWidget(FTableWidget):
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 2:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                                     img="go-next.png")), "Ajouter")
+            return QTableWidgetItem(QIcon(
+                u"{img_media}{img}".format(img_media=Config.img_cmedia,
+                                           img="go-next.png")), "Ajouter")
         if column == 0:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                                     img="info.png")), "")
+            return QTableWidgetItem(QIcon(
+                u"{img_media}{img}".format(img_media=Config.img_cmedia,
+                                           img="info.png")), "")
         return super(ResultatTableWidget, self)._item_for_data(row, column,
                                                                data, context)
 
     def click_item(self, row, column, *args):
-        self.choix = Product.filter(name=self.data[row][1]).get()
+        self.choix = Product.filter(name=self.data[row][-2]).get()
         if column != 2:
             self.parent.table_info.refresh_(self.choix.id)
         if column == 2:
@@ -194,103 +195,110 @@ class InputTableWidget(FTableWidget):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
         self.parent = parent
 
-        self.hheaders = [u"Quantité (en carton)", u"Désignation"]
+        self.hheaders = [u"Quantité (carton)", "Nombre pièce", u"Désignation"]
         # self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
 
-        self.stretch_columns = [0, 1]
-        self.align_map = {1: 'l', 0: 'r'}
+        self.stretch_columns = [0, 1, 2]
+        self.align_map = {0: 'r', 1: 'r', 2: 'l'}
         self.display_vheaders = False
-        self.display_fixed = True
+        # self.display_fixed = True
         self.refresh_()
         self.isvalid = True
+        self.col_dest = 2
+        self.col_qtty = 0
 
     def refresh_(self, choix=None):
         if choix:
-            self.row = [1, u"%s" % choix.name]
-            if not [row for row in self.data if self.row[1] in row]:
+            self.row = [1, choix.number_parts_box, u"%s" % choix.name]
+            if not [row for row in self.data if self.row[self.col_dest] in row]:
                 self.set_data_for()
                 self.refresh()
+            self.refresh()
 
     def set_data_for(self):
 
         self._reset()
         self.data.extend([self.row])
-        self.refresh()
+        self.refresh_()
+
+        pw = self.width() / 4 - 20
+        self.setColumnWidth(0, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, (pw * 2))
 
     def popup(self, pos):
         if (len(self.data) - 1) < self.selectionModel().selection().indexes()[0].row():
             return False
         menu = QMenu()
-        quitAction = menu.addAction("Supprimer cette ligne")
+        quit_action = menu.addAction("Supprimer cette ligne")
         action = menu.exec_(self.mapToGlobal(pos))
-        if action == quitAction:
+        if action == quit_action:
             try:
                 self.data.pop(self.selectionModel()
                                   .selection().indexes()[0].row())
             except IndexError:
                 pass
-            self.refresh()
+            self.refresh_()
 
     def extend_rows(self):
         nb_rows = self.rowCount()
 
         self.setRowCount(nb_rows + 1)
         # self.setSpan(nb_rows, 0, 1, 1)
-        bicon = QIcon.fromTheme('', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                                     img='save.png')))
+        bicon = QIcon.fromTheme(
+            '', QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
+                                                 img='save.png')))
         self.button = QPushButton(bicon, u"Enrgistrer l'entrée")
         self.button.released.connect(self.parent.save_b)
-        self.setCellWidget(nb_rows, 1, self.button)
-
-        # pw = (self.parentWidget().width()) / 3
-        # self.setColumnWidth(0, pw)
-        # self.setColumnWidth(1, (pw * 2) - 2)
+        self.setCellWidget(nb_rows, self.col_dest, self.button)
 
     def _item_for_data(self, row, column, data, context=None):
-        if column != 1 and column != 3:
+        if column == 0:
             self.line_edit = IntLineEdit(u"%s" % data)
             self.line_edit.textChanged.connect(self.changed_value)
             return self.line_edit
-        return super(InputTableWidget, self)._item_for_data(row,
-                                                            column, data,
-                                                            context)
+        return super(InputTableWidget, self)._item_for_data(
+            row, column, data, context)
 
     def _update_data(self, row_num, new_data):
-        self.data[row_num] = (new_data[0], self.data[row_num][1], new_data[0])
+        self.data[row_num] = (new_data[0], new_data[1], self.data[row_num][2])
 
     def get_table_items(self):
-        """  """
         list_stock_input = []
         for i in range(self.rowCount() - 1):
             liste_item = []
             row_data = self.data[i]
             try:
-                liste_item.append(int(row_data[0]))
-                liste_item.append(str(row_data[1]))
+                liste_item.append(int(row_data[self.col_qtty]))
+                liste_item.append(str(row_data[self.col_dest]))
                 list_stock_input.append(liste_item)
             except Exception as e:
-                print(e)
                 liste_item.append("")
 
         return list_stock_input
 
     def changed_value(self, refresh=False):
         """ Calcule les Resultat """
+        self.isvalid = True
         for row_num in xrange(0, self.data.__len__()):
 
-            qtsaisi = is_int(self.cellWidget(row_num, 0).text())
-            self.isvalid = True
+            qtsaisi = is_int(self.cellWidget(row_num, self.col_qtty).text())
+            nb_parts_box = Product.filter(name=self.item(
+                row_num, self.col_dest).text()).get().number_parts_box * qtsaisi
+
             viderreur_qtsaisi = ""
-            stylerreur = "background-color: rgb(255, 235, 235);border: 3px double SeaGreen"
             if qtsaisi == 0:
-                viderreur_qtsaisi = stylerreur
+                viderreur_qtsaisi = "background-color: rgb(255, 235, 235);border: 3px double SeaGreen"
                 self.cellWidget(row_num, 0).setToolTip(
                     u"La quantité est obligatoire")
                 self.isvalid = False
-
             self.cellWidget(row_num, 0).setStyleSheet(viderreur_qtsaisi)
-
             self.cellWidget(row_num, 0).setToolTip("")
-            self._update_data(row_num, [qtsaisi])
+            self._update_data(row_num, [qtsaisi, nb_parts_box])
+
+            nb_parts_box = QTableWidgetItem(
+                formatted_number(u"%d" % nb_parts_box))
+            nb_parts_box.setTextAlignment(Qt.AlignRight)
+            self.setItem(row_num, 1, nb_parts_box)

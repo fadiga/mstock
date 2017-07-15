@@ -5,8 +5,8 @@
 from datetime import datetime
 
 import peewee
-from GCommon.models import (BaseModel, SettingsAdmin, Version, FileJoin, Organization,
-                            Owner, Category, Store)
+from GCommon.models import (BaseModel, SettingsAdmin, Version, FileJoin,
+                            Organization, Owner, Category, Store)
 
 
 class Store(Store):

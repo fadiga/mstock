@@ -21,6 +21,7 @@ from ui.dashboard import DashbordViewWidget
 from ui.stock_input import StockInputWidget
 from ui.stock_output import StockOutputWidget
 from ui.reports_managers import GReportViewWidget
+from ui.report_product_store import ReportProductStoreWidget
 # from ui.helps import HTMLView
 
 from Common.ui.cmenubar import FMenuBar
@@ -51,6 +52,8 @@ class MenuBar(FMenuBar, FWidget):
                     "shortcut": "Ctrl+M", "goto": StoresViewWidget},
                 {"name": u"Facturation", "icon": 'invoice', "admin": False,
                     "shortcut": "Ctrl+F", "goto": InvoiceViewWidget},
+                {"name": u"Situation du stock", "icon": '', "admin": False,
+                    "shortcut": "ctrl+D", "goto": ReportProductStoreWidget},
                 {"name": u"Mouvements", "icon": 'reports', "admin": False,
                     "shortcut": "alt+T", "goto": GReportViewWidget},
                 ]
