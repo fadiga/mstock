@@ -125,10 +125,10 @@ class Reports(BaseModel):
 
     def __str__(self):
         return u"{product} --> {store} le {type_} \
-                 {.date}".format(type_=self.type_,
-                                 date=self.date.strftime('%x %Hh:%Mmm'),
-                                 store=self.store,
-                                 product=self.product)
+                 {date}".format(type_=self.type_,
+                                date=self.date.strftime('%x %Hh:%Mmm'),
+                                store=self.store,
+                                product=self.product)
 
     def save(self):
         """

@@ -10,8 +10,8 @@ from PyQt4.QtCore import QDate, Qt
 from configuration import Config
 from models import (Store, Product, Reports)
 
-from Common.ui.common import (FWidget, FormatDate, FLabel)
-from Common.ui.util import formatted_number, is_int
+from Common.ui.common import (FWidget, FormatDate, FPageTitle)
+from Common.ui.util import formatted_number, is_int, show_date
 from Common.ui.table import FTableWidget
 
 
@@ -20,15 +20,16 @@ class ReportProductStoreWidget(FWidget):
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(ReportProductStoreWidget, self).__init__(
             parent=parent, *args, **kwargs)
-        title = u"  Situation"
+        title = u" <h1> Situation </h1>"
         self.parentWidget().setWindowTitle(Config.NAME_ORGA + title)
-        Config.logging.info(title)
         self.parent = parent
 
         vbox = QVBoxLayout(self)
         editbox = QGridLayout()
+        self.format_prod_label = "<h2 > Produit:<i style = 'color:blue' > {} < /i > Categorie: <i style = 'color:blue'> {} < /i > <h2 >"
 
-        self.prod_label = FLabel("")
+        self.prod_label = FPageTitle(
+            self.format_prod_label.format("...", "..."))
         self.date = FormatDate(QDate.currentDate())
 
         self.search_field = QLineEdit()
@@ -49,8 +50,8 @@ class ReportProductStoreWidget(FWidget):
         self.table_resultat = ReportTableWidget(parent=self)
 
         editbox.addWidget(self.search_field, 1, 0)
-        editbox.addWidget(self.vline, 1, 2, 2, 1)
-        editbox.setColumnStretch(3, 3)
+        # editbox.addWidget(self.vline, 1, 2, 2, 1)
+        # editbox.setColumnStretch(3, 3)
 
         vbox.addWidget(self.prod_label)
         vbox.addLayout(editbox)
@@ -59,7 +60,6 @@ class ReportProductStoreWidget(FWidget):
 
     def finder(self):
         value = str(self.search_field.text())
-        self.prod_label.setText(value)
         self.table_resultat.refresh_(value)
 
 
@@ -75,7 +75,7 @@ class ReportTableWidget(FTableWidget):
         self.parent = parent
 
         self.sorter = True
-        self.stretch_columns = [0, 1, 2]
+        self.stretch_columns = [0, 1, 2, 3]
         self.align_map = {0: 'l', 1: 'r', 2: 'r'}
         # self.ecart = -5
         self.display_vheaders = False
@@ -97,6 +97,10 @@ class ReportTableWidget(FTableWidget):
             reports = []
             try:
                 prod = Product.get(name=product)
+
+                self.parent.prod_label.setText(
+                    self.parent.format_prod_label.format(
+                        prod.name, prod.category))
             except:
                 return
 
@@ -108,29 +112,29 @@ class ReportTableWidget(FTableWidget):
                     remaining = repts.remaining
                     last_op = repts.date
                 except Exception as e:
-                    remaining = 0
-                    last_op = ""
+                    print(e)
+                    continue
                 dict_store = {}
                 dict_store["store"] = store.name
-                dict_store["last_remaining_box"] = remaining
-                dict_store["last_remaining_p"] = remaining * \
-                    prod.number_parts_box
+                dict_store["last_remaining_box"] = formatted_number(remaining)
+                dict_store["last_remaining_p"] = formatted_number(
+                    remaining * prod.number_parts_box)
                 dict_store["last_op"] = last_op
                 reports.append(dict_store)
 
             self.data = [(rep.get('store'), rep.get('last_remaining_box'),
-                          rep.get('last_remaining_p'), rep.get('last_op')
-                          ) for rep in reports]
+                          rep.get('last_remaining_p'), show_date(
+                              rep.get('last_op'))) for rep in reports]
             self.refresh()
 
-    def click_item(self, row, column, *args):
-        product_column = 0
-        if column == product_column:
-            from ui.by_product import By_productViewWidget
-            self.parent.change_main_context(
-                By_productViewWidget, product=self.data[row][product_column])
-        else:
-            return
+    # def click_item(self, row, column, *args):
+    #     product_column = 0
+    #     if column == product_column:
+    #         from ui.by_product import By_productViewWidget
+    #         self.parent.change_main_context(
+    #             By_productViewWidget, product=self.data[row][product_column])
+    #     else:
+    #         return
 
     def extend_rows(self):
 

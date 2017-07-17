@@ -8,7 +8,7 @@ from PyQt4 import QtGui, QtCore
 
 from configuration import Config
 from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
-                              BttSmall, FormatDate)
+                              Button, FormatDate)
 from database import Reports, Product
 from Common.ui.table import FTableWidget
 from Common.ui.util import formatted_number, is_int, date_on_or_end
@@ -30,7 +30,8 @@ class InventoryViewWidget(FWidget):
 
         self.on_date = FormatDate(QtCore.QDate(date.today().year, 1, 1))
         self.end_date = FormatDate(QtCore.QDate.currentDate())
-        self.btt_ok = BttSmall(u"Ok")
+        # self.end_date.textChanged.connect(self.finder)
+        self.btt_ok = Button(u"Ok")
         self.btt_ok.clicked.connect(self.rapport_filter)
         self.btt_export = BttExportXLS(u"Exporter")
         self.btt_export.clicked.connect(self.export_xls)
@@ -40,12 +41,12 @@ class InventoryViewWidget(FWidget):
         gridbox = QtGui.QGridLayout()
         gridbox.addWidget(FormLabel(u"Date debut"), 0, 1)
         gridbox.addWidget(self.on_date, 0, 2)
-        gridbox.addWidget(FormLabel(u"Date fin"), 1, 1)
-        gridbox.addWidget(self.end_date, 1, 2)
-        gridbox.addWidget(self.btt_ok, 1, 3)
-        gridbox.setColumnStretch(4, 5)
-        gridbox.addWidget(self.btt_export, 1, 6)
-        vbox.addWidget(FPageTitle(self.title))
+        gridbox.addWidget(FormLabel(u"Date fin"), 0, 3)
+        gridbox.addWidget(self.end_date, 0, 4)
+        gridbox.addWidget(self.btt_ok, 0, 5)
+        gridbox.setColumnStretch(7, 2)
+        gridbox.addWidget(self.btt_export, 0, 8)
+        vbox.addWidget(FPageTitle(u"<h2> {} <h2>".format(self.title)))
         vbox.addLayout(gridbox)
         vbox.addWidget(self.invent_table)
         self.setLayout(vbox)
@@ -84,7 +85,7 @@ class InventoryTableWidget(FTableWidget):
         self.hheaders = [u"Magasin", u"Code art.", u"Article",
                          u"Qtté Restante (Carton)", "Qtté (piéce)"]
         self.stretch_columns = [0, 1, 2, 3]
-        self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r'}
+        self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r', 4: 'r'}
         self.display_vheaders = True
         self.live_refresh = False
         self.sorter = True
@@ -94,6 +95,12 @@ class InventoryTableWidget(FTableWidget):
         self._reset()
         self.set_data_for(on, end)
         self.refresh()
+
+        pw = (self.width()) / 5
+        self.setColumnWidth(0, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, pw)
+        self.setColumnWidth(3, pw)
 
     def set_data_for(self, on, end):
 
@@ -107,8 +114,9 @@ class InventoryTableWidget(FTableWidget):
                         .get())
                 except:
                     pass
-            self.data = [(rep.store.name, rep.product.code, rep.product.name,
-                          rep.remaining, rep.remaining * rep.product.number_parts_box)
+            self.data = [(rep.store.name, rep.product.code,
+                          rep.product.name, rep.remaining,
+                          rep.remaining * rep.product.number_parts_box)
                          for rep in reports]
 
     def _item_for_data(self, row, column, data, context=None):
@@ -131,21 +139,21 @@ class InventoryTableWidget(FTableWidget):
             except IndexError:
                 pass
 
-    def changed_value(self, refresh=False):
+    # def changed_value(self, refresh=False):
 
-        some = 0
-        for row_num in xrange(0, self.data.__len__()):
-            ui_item = (is_int(self.item(row_num, 1).text()) *
-                       is_int(self.cellWidget(row_num, 2).text()))
-            some += ui_item
-            ui_item_ = QtGui.QTableWidgetItem(formatted_number(ui_item))
-            ui_item_.setTextAlignment(QtCore.Qt.AlignRight)
-            self.setItem(row_num, 3, ui_item_)
-        row_num += 1
-        som_val = QtGui.QTableWidgetItem(formatted_number(some))
-        som_val.setTextAlignment(QtCore.Qt.AlignRight)
-        self.setItem(row_num + 1, 2, QtGui.QTableWidgetItem(u"%s" % u"TOTAUX"))
-        self.setItem(row_num + 1, 3, som_val)
+    #     some = 0
+    #     for row_num in xrange(0, self.data.__len__()):
+    #         ui_item = (is_int(self.item(row_num, 1).text()) *
+    #                    is_int(self.cellWidget(row_num, 2).text()))
+    #         some += ui_item
+    #         ui_item_ = QtGui.QTableWidgetItem(formatted_number(ui_item))
+    #         ui_item_.setTextAlignment(QtCore.Qt.AlignRight)
+    #         self.setItem(row_num, 3, ui_item_)
+    #     row_num += 1
+    #     som_val = QtGui.QTableWidgetItem(formatted_number(some))
+    #     som_val.setTextAlignment(QtCore.Qt.AlignRight)
+    #     self.setItem(row_num + 1, 2, QtGui.QTableWidgetItem(u"%s" % u"TOTAUX"))
+    #     self.setItem(row_num + 1, 3, som_val)
 
     def get_table_items(self):
         """  """
@@ -169,25 +177,19 @@ class InventoryTableWidget(FTableWidget):
         self.refresh()
 
     def extend_rows(self):
+        pass
+        # nb_rows = self.rowCount()
+        # self.setRowCount(nb_rows + 2)
+        # self.setSpan(nb_rows, 0, 2, 2)
+        # mtt_ttc = QtGui.QTableWidgetItem(u"TOTAUX: ")
+        # mtt_ttc.setTextAlignment(QtCore.Qt.AlignRight)
+        # self.setItem(nb_rows + 1, 2, mtt_ttc)
 
-        pw = (self.parentWidget().width()) / 4
-        self.setColumnWidth(0, pw)
-        self.setColumnWidth(1, pw)
-        self.setColumnWidth(2, pw)
-        self.setColumnWidth(3, pw)
-
-        nb_rows = self.rowCount()
-        self.setRowCount(nb_rows + 2)
-        self.setSpan(nb_rows, 0, 2, 2)
-        mtt_ttc = QtGui.QTableWidgetItem(u"TOTAUX: ")
-        mtt_ttc.setTextAlignment(QtCore.Qt.AlignRight)
-        self.setItem(nb_rows + 1, 2, mtt_ttc)
-
-        self.montant_ht = 0
-        for row_num in xrange(0, self.data.__len__()):
-            mtt = is_int(self.item(row_num, 3).text())
-            self.montant_ht += mtt
-        # Montant TTC
-        montant_ttc = QtGui.QTableWidgetItem(formatted_number(self.montant_ht))
-        montant_ttc.setTextAlignment(QtCore.Qt.AlignRight)
-        self.setItem(row_num + 2, 3, montant_ttc)
+        # self.montant_ht = 0
+        # for row_num in xrange(0, self.data.__len__()):
+        #     mtt = is_int(self.item(row_num, 3).text())
+        #     self.montant_ht += mtt
+        # # Montant TTC
+        # montant_ttc = QtGui.QTableWidgetItem(formatted_number(self.montant_ht))
+        # montant_ttc.setTextAlignment(QtCore.Qt.AlignRight)
+        # self.setItem(row_num + 2, 3, montant_ttc)

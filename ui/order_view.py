@@ -28,7 +28,7 @@ class OrderViewWidget(FWidget):
         self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"    COMMANDE")
         self.parent = parent
 
-        self.title = FPageTitle(u"Faire une Commande")
+        self.title = FPageTitle("<h1> Faire une Commande </h1>")
 
         vbox = QVBoxLayout()
         self.order_table = OrederTableWidget(parent=self)

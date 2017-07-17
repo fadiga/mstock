@@ -62,9 +62,9 @@ class DashbordViewWidget(FWidget):
         # table_invoice.addWidget(self.title_invoice)
         # table_mouvement.addWidget(self.title_mouvement)
         table_mouvement.addWidget(self.table_mouvement)
-        tab_widget = tabbox((table_mouvement, u"Les Mouvements"),
-                            (table_invoice, u"Les Factures"),
-                            (table_alert, u"Alertes sur les produits "))
+        tab_widget = tabbox((table_alert, u"Alertes sur les produits"),
+                            (table_mouvement, u"Les Mouvements"),
+                            (table_invoice, u"Les Factures"))
 
         vbox.addWidget(self.title)
         vbox.addWidget(tab_widget)
@@ -119,11 +119,11 @@ class GReportTableWidget(FTableWidget):
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0 and self.data[row][0] == Reports.E:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="in.png")), u"")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_media, img="in.png")), u"")
         if column == 0 and self.data[row][0] == Reports.S:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="out.png")), u"")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_media,  img="out.png")), u"")
 
         return super(GReportTableWidget, self)._item_for_data(row, column,
                                                               data, context)
@@ -176,8 +176,8 @@ class InvoiceTableWidget(FTableWidget):
 
     def _item_for_data(self, row, column, data, context=None):
         if column == self.data[0].__len__() - 1:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="go-next.png")), (u"voir"))
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_media, img="go-next.png")), (u"voir"))
 
         return super(InvoiceTableWidget, self)._item_for_data(row, column,
                                                               data, context)
@@ -187,8 +187,9 @@ class InvoiceTableWidget(FTableWidget):
         if column != last_column:
             return
         try:
-            self.parent.change_main_context(ShowInvoiceViewWidget,
-                                            table_p=self, invoice=Invoice.get(number=(self.data[row][1])))
+            self.parent.change_main_context(
+                ShowInvoiceViewWidget,
+                table_p=self, invoice=Invoice.get(number=(self.data[row][1])))
         except IndexError:
             pass
 
@@ -216,8 +217,8 @@ class AlertTableWidget(FTableWidget):
     def set_data_for(self):
         reports = lastes_upper_of(10)
         if multi_store:
-            self.data = [(rep.store.name, rep.product.name, rep.remaining, show_date(rep.date))
-                         for rep in reports]
+            self.data = [(rep.store.name, rep.product.name, rep.remaining,
+                          show_date(rep.date)) for rep in reports]
         else:
             self.data = [(rep.product.name, rep.remaining, show_date(rep.date))
                          for rep in reports]

@@ -3,14 +3,14 @@
 # maintainer: Fadiga
 
 from datetime import date
-from PyQt4.QtCore import Qt, SIGNAL, SLOT, QDate
+from PyQt4.QtCore import Qt, QDate
 from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QTableWidgetItem,
                          QIcon, QMenu)
 
 from configuration import Config
 from models import Reports, Product
 from Common.ui.common import (FWidget, FPageTitle, FormatDate, Button,
-                              BttExportXLS, FormLabel)
+                              FormLabel)
 from Common.ui.table import FTableWidget
 from Common.ui.util import (formatted_number, raise_error, date_on_or_end,
                             show_date)
@@ -44,22 +44,27 @@ class GReportViewWidget(FWidget):
         gridbox.addWidget(self.end_date, 0, 5)
         gridbox.addWidget(self.Button, 0, 6)
         gridbox.setColumnStretch(7, 5)
-
-        period = " Du {} au {}".format(
+        self.text_format = "Les mouvements du {} au {}"
+        self.period_label = FPageTitle(self.text_format.format(
             show_date(self.on_date.text(), time=False),
-            show_date(self.end_date.text(), time=False))
+            show_date(self.end_date.text(), time=False)))
         self.report_filter()
 
         vbox = QVBoxLayout()
-        vbox.addWidget(FPageTitle(self.title))
-        vbox.addWidget(FormLabel(period))
+        vbox.addWidget(self.period_label)
+        # vbox.addWidget(FormLabel(period))
         vbox.addLayout(gridbox)
         vbox.addLayout(tablebox)
         self.setLayout(vbox)
 
     def report_filter(self):
-        self.table_op.refresh_(on=date_on_or_end(self.on_date.text()),
-                               end=date_on_or_end(self.end_date.text(), on=False))
+        self.period_label.setText(self.text_format.format(
+            show_date(self.on_date.text(), time=False),
+            show_date(self.end_date.text(), time=False)))
+
+        self.table_op.refresh_(
+            on=date_on_or_end(self.on_date.text()),
+            end=date_on_or_end(self.end_date.text(), on=False))
 
 
 class GReportTableWidget(FTableWidget):
@@ -94,8 +99,8 @@ class GReportTableWidget(FTableWidget):
                 name_product = self.data[item.row()][2]
                 qtte_in_box = Product.select().where(
                     Product.name == str(name_product)).get().number_parts_box
-                item.setToolTip("{} pièces".format(
-                    int(self.data[item.row()][item.column()]) * int(qtte_in_box)))
+                item.setToolTip("{} pièces".format(int(self.data[item.row()][
+                    item.column()]) * int(qtte_in_box)))
             self.current_hover = [row, column]
 
     def refresh_(self, on=None, end=None):
@@ -108,20 +113,22 @@ class GReportTableWidget(FTableWidget):
         self.setColumnWidth(0, 40)
 
     def set_data_for(self, on, end):
+
         self.data = [(rap.type_, rap.store.name, rap.product,
                       formatted_number(rap.qty_use),
                       formatted_number(rap.remaining),
                       show_date(rap.date), rap.id)
-                     for rap in Reports.filter(deleted=False, date__gte=on, date__lte=end)
-                     .order_by(Reports.date.desc())]
+                     for rap in Reports.filter(
+            deleted=False, date__gte=on, date__lte=end)
+            .order_by(Reports.date.desc())]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0 and self.data[row][0] == Reports.E:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="in.png")), u"")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_media, img="in.png")), u"")
         if column == 0 and self.data[row][0] == Reports.S:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="out.png")), u"")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_media, img="out.png")), u"")
 
         return super(GReportTableWidget, self)._item_for_data(row, column,
                                                               data, context)
@@ -147,14 +154,13 @@ class GReportTableWidget(FTableWidget):
         remaining, nb = report.store.get_remaining_and_nb_parts(report.product)
         remaining -= report.remaining
         if remaining >= 0:
-            self.parent.open_dialog(ConfirmDeletionDiag, modal=True,
-                                    obj_delete=report,
-                                    msg="Magasin : {}\nProduit: {}\nQuantité: {}".format(report.store,
-                                                                                         report.product,
-                                                                                         report.qty_use),
-                                    table_p=self.parent.table_op)
-            rep = Reports.select().where(Reports.date <
-                                         report.date).order_by(Reports.date.desc()).get()
+            self.parent.open_dialog(
+                ConfirmDeletionDiag, modal=True, obj_delete=report,
+                msg="Magasin : {}\nProduit: {}\nQuantité: {}".format(
+                    report.store, report.product, report.qty_use),
+                table_p=self.parent.table_op)
+            rep = Reports.select().where(
+                Reports.date < report.date).order_by(Reports.date.desc()).get()
             rep.save()
         else:
             raise_error(u"Erreur", u"Impossible de supprimer ce rapport car"

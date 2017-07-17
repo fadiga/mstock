@@ -19,6 +19,9 @@ class Config(CConstants):
     def __init__(self):
         CConstants.__init__(self)
 
+        self.ExportFolders.append("Files")
+        self.ExportFiles.append("tmp_order.txt")
+
     # ------------------------- Organisation --------------------------#
 
     from Common.models import Organization, Version
@@ -30,7 +33,7 @@ class Config(CConstants):
     try:
         sttg = Organization().get(Organization.id == 1)
         # LOGIN = sttg.login
-        NAME_ORGA = sttg.name_orga
+        NAME_ORGA = "{} ".format(sttg.name_orga)
         TEL_ORGA = sttg.phone
         ADRESS_ORGA = sttg.adress_org
         BP = sttg.bp
