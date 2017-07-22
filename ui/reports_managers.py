@@ -8,14 +8,12 @@ from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QTableWidgetItem,
                          QIcon, QMenu)
 
 from configuration import Config
-from models import Reports, Product
+from models import Reports, Store
 from Common.ui.common import (FWidget, FPageTitle, FormatDate, Button,
                               FormLabel)
 from Common.ui.table import FTableWidget
-from Common.ui.util import (formatted_number, raise_error, date_on_or_end,
-                            show_date)
-
-from GCommon.ui.confirm_deletion import ConfirmDeletionDiag
+from Common.ui.util import (
+    formatted_number, raise_error, date_on_or_end, show_date)
 
 
 class GReportViewWidget(FWidget):
@@ -28,19 +26,19 @@ class GReportViewWidget(FWidget):
         self.parent = parent
         self.title = u"Tous les mouvements"
         tablebox = QVBoxLayout()
+        self.on_date = FormatDate(QDate(date.today().year, 1, 1))
+        self.end_date = FormatDate(QDate.currentDate())
+        self.Button = Button(u"OK")
+        self.Button.clicked.connect(self.refresh_)
         self.table_op = GReportTableWidget(parent=self)
         tablebox.addWidget(self.table_op)
 
-        self.on_date = FormatDate(QDate(date.today().year, 1, 1))
-        self.end_date = FormatDate(QDate.currentDate())
-        self.Button = Button(_(u"OK"))
-        self.Button.clicked.connect(self.report_filter)
         vbox = QVBoxLayout()
         # Grid
         gridbox = QGridLayout()
-        gridbox.addWidget(FormLabel(_(u"Debut")), 0, 2)
+        gridbox.addWidget(FormLabel("Debut"), 0, 2)
         gridbox.addWidget(self.on_date, 0, 3)
-        gridbox.addWidget(FormLabel(_(u"Fin")), 0, 4)
+        gridbox.addWidget(FormLabel("Fin"), 0, 4)
         gridbox.addWidget(self.end_date, 0, 5)
         gridbox.addWidget(self.Button, 0, 6)
         gridbox.setColumnStretch(7, 5)
@@ -48,7 +46,7 @@ class GReportViewWidget(FWidget):
         self.period_label = FPageTitle(self.text_format.format(
             show_date(self.on_date.text(), time=False),
             show_date(self.end_date.text(), time=False)))
-        self.report_filter()
+        self.refresh_()
 
         vbox = QVBoxLayout()
         vbox.addWidget(self.period_label)
@@ -57,14 +55,11 @@ class GReportViewWidget(FWidget):
         vbox.addLayout(tablebox)
         self.setLayout(vbox)
 
-    def report_filter(self):
+    def refresh_(self):
+        self.table_op.refresh_()
         self.period_label.setText(self.text_format.format(
             show_date(self.on_date.text(), time=False),
             show_date(self.end_date.text(), time=False)))
-
-        self.table_op.refresh_(
-            on=date_on_or_end(self.on_date.text()),
-            end=date_on_or_end(self.end_date.text(), on=False))
 
 
 class GReportTableWidget(FTableWidget):
@@ -82,7 +77,7 @@ class GReportTableWidget(FTableWidget):
         self.customContextMenuRequested.connect(self.popup)
         self.setMouseTracking(True)
         self.current_hover = [0, 0]
-        self.cellEntered.connect(self.cellHover)
+        # self.cellEntered.connect(self.cellHover)
 
         self.stretch_columns = [1, 2, 5]
         self.align_map = {0: 'l', 1: "l", 2: "l", 3: "r", 4: "r"}
@@ -90,37 +85,28 @@ class GReportTableWidget(FTableWidget):
         self.display_vheaders = False
         self.refresh_()
 
-    def cellHover(self, row, column):
-        item = self.item(row, column)
-        if self.current_hover != [row, column]:
-            # item.setBackground(QColor('moccasin'))
-            if column in [3, 4]:
-                item = self.item(row, column)
-                name_product = self.data[item.row()][2]
-                qtte_in_box = Product.select().where(
-                    Product.name == str(name_product)).get().number_parts_box
-                item.setToolTip("{} pièces".format(int(self.data[item.row()][
-                    item.column()]) * int(qtte_in_box)))
-            self.current_hover = [row, column]
-
-    def refresh_(self, on=None, end=None):
+    def refresh_(self):
         """ """
+
         self._reset()
-        self.set_data_for(on, end)
+        self.set_data_for()
         self.refresh()
         # je cache la 7 eme colonne
         self.hideColumn(6)
         self.setColumnWidth(0, 40)
 
-    def set_data_for(self, on, end):
+    def set_data_for(self):
+
+        on = date_on_or_end(self.parent.on_date.text()),
+        end = date_on_or_end(self.parent.end_date.text(), on=False)
 
         self.data = [(rap.type_, rap.store.name, rap.product,
                       formatted_number(rap.qty_use),
                       formatted_number(rap.remaining),
                       show_date(rap.date), rap.id)
                      for rap in Reports.filter(
-            deleted=False, date__gte=on, date__lte=end)
-            .order_by(Reports.date.desc())]
+            deleted=False, date__gte=on, date__lte=end).order_by(
+            Reports.date.desc(), Reports.store.desc(), Reports.product.desc())]
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0 and self.data[row][0] == Reports.E:
@@ -142,27 +128,57 @@ class GReportTableWidget(FTableWidget):
         self.report = Reports.select().where(
             Reports.id == self.data[row][6]).get()
         menu = QMenu()
-        menu.addAction(QIcon("{}del.png".format(Config.img_cmedia)),
-                       u"supprimer", lambda: self.del_report(self.report))
+        delaction = menu.addAction(
+            QIcon("{}del.png".format(Config.img_cmedia)), "supprimer")
+        editaction = menu.addAction(
+            QIcon("{}edit.png".format(Config.img_cmedia)), "Modifier")
 
-        self.action = menu.exec_(self.mapToGlobal(pos))
+        select = Store.select().where(Store.name == self.data[row][1])
+        addgroup = menu.addMenu(u"Transfert")
+        # # Ajout au groupe
+        lt_grp_select = [(i.name) for i in select]
+        [addgroup.addAction("{}".format(grp.name),
+                            lambda grp=grp: self.transfer(
+                                grp, self.data[row][-1]))
+         for grp in Store.select() if not grp.name in lt_grp_select]
+        action = menu.exec_(self.mapToGlobal(pos))
+
+        if action == editaction:
+            from ui.report_edit import EditReportViewWidget
+            self.parent.open_dialog(
+                EditReportViewWidget, modal=True, report=self.report,
+                table_p=self.parent.table_op)
+        if action == delaction:
+            from ui.deleteview import DeleteViewWidget
+            self.parent.open_dialog(
+                DeleteViewWidget, modal=True, trash=False,
+                table_p=self.parent.table_op, obj=self.report)
+        self.refresh()
+
+    def transfer(self, store, report_id):
+        rep = Reports.get(id=report_id)
+        if not self.check_befor(rep):
+            return
+        rep_ = Reports.get(id=report_id)
+        rep_.store = store
+        if not self.check_befor(rep_):
+            return
+        rep_.save()
+        rep.recalculate()
+        self.parent.refresh_()
 
     def click_item(self, row, column, *args):
         pass
 
-    def del_report(self, report):
-        remaining, nb = report.store.get_remaining_and_nb_parts(report.product)
-        remaining -= report.remaining
-        if remaining >= 0:
-            self.parent.open_dialog(
-                ConfirmDeletionDiag, modal=True, obj_delete=report,
-                msg="Magasin : {}\nProduit: {}\nQuantité: {}".format(
-                    report.store, report.product, report.qty_use),
-                table_p=self.parent.table_op)
-            rep = Reports.select().where(
-                Reports.date < report.date).order_by(Reports.date.desc()).get()
-            rep.save()
+    def check_befor(self, report):
+        from data_helper import check_befor_update_data
+        remaining, isok = check_befor_update_data(report)
+        if isok:
+            return True
         else:
-            raise_error(u"Erreur", u"Impossible de supprimer ce rapport car"
-                        u" le restant sera : <b>%s</b> qui est < 0"
-                        % remaining)
+            raise_error(
+                "Erreur", "Impossible de déplacer ({}) {} du  {}/{} car"
+                " le restant ({}) sera  < 0".format(
+                    report.qty_use, report.type_, report.product.name,
+                    report.store.name, remaining))
+            return False

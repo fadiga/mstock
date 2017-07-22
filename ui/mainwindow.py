@@ -3,7 +3,8 @@
 # vim: ai ts=4 sts=4 et sw=4 nu
 # maintainer: Fad
 
-from __future__ import (unicode_literals, absolute_import, division, print_function)
+from __future__ import (
+    unicode_literals, absolute_import, division, print_function)
 
 from PyQt4.QtGui import QIcon
 from PyQt4.QtCore import Qt
@@ -20,11 +21,12 @@ from ui.dashboard import DashbordViewWidget
 
 
 class MainWindow(FMainWindow):
+
     def __init__(self):
         FMainWindow.__init__(self)
 
         self.setWindowIcon(QIcon.fromTheme('logo',
-                           QIcon(u"{}".format(Config.APP_LOGO))))
+                                           QIcon(u"{}".format(Config.APP_LOGO))))
         self.menubar = MenuBar(self)
         self.setMenuBar(self.menubar)
         self.toolbar = MenuToolBar(self)
@@ -45,7 +47,6 @@ class MainWindow(FMainWindow):
         b.setCounter(count)
         self.toolbar.addWidget(b)
 
-
     def exit(self):
         self.logout()
         self.close()
@@ -53,4 +54,3 @@ class MainWindow(FMainWindow):
     def active_menu(self):
         self.menubar = MenuBar(self)
         self.setMenuBar(self.menubar)
-

@@ -11,6 +11,7 @@ import sys
 import locale
 import gettext
 import gettext_windows
+
 sys.path.append(os.path.abspath('../'))
 
 from PyQt4.QtGui import QApplication

@@ -158,8 +158,9 @@ class ResultatTableWidget(FTableWidget):
         products = [(Product.get(id=rpt.product_id).name) for rpt in
                     Reports.select(fn.Distinct(Reports.product))]
         if value:
-            products = [(prod.name) for prod in Product.select().where(Product.name.contains(value))
-                        .where(Product.name << products).order_by(Product.name.desc())]
+            products = [(prod.name) for prod in Product.select(
+            ).where(Product.name.contains(value)).where(
+                Product.name << products).order_by(Product.name.desc())]
         self.data = [("", rpt, "") for rpt in products]
 
     def _item_for_data(self, row, column, data, context=None):

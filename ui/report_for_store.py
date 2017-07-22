@@ -66,7 +66,6 @@ class ReportTableWidget(FTableWidget):
     def set_data_for(self):
 
         reports = []
-        print(self.store)
         try:
             store = Store.get(name=self.store)
         except Exception as e:

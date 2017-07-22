@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 # Autor: Fadiga
 
-
-from models import (SettingsAdmin, Version, FileJoin, Organization,
-                    Owner, Category, Store, Product, Reports, Invoice, InvoiceItem)
+from Common.models import (Organization, License,
+                           SettingsAdmin, Version, FileJoin)
+from models import (Owner, Category, Store,
+                    Product, Reports, Invoice, InvoiceItem)
 
 
 def setup(drop_tables=False):
@@ -12,7 +13,7 @@ def setup(drop_tables=False):
 
     did_create = False
 
-    for model in [SettingsAdmin, Version, FileJoin, Organization,
+    for model in [SettingsAdmin, Version, FileJoin, License,
                   Organization, Store, Product, Category, Reports,
                   Owner, Invoice, InvoiceItem]:
         if drop_tables:

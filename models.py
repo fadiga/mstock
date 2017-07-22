@@ -5,18 +5,24 @@
 from datetime import datetime
 
 import peewee
-from GCommon.models import (BaseModel, SettingsAdmin, Version, FileJoin,
-                            Organization, Owner, Category, Store)
+
+from Common.models import (
+    BaseModel, FileJoin, Owner)
+
+
+from GCommon.models import Store, Category
 
 
 class Store(Store):
 
     def last_report(self):
-        return self.get_or_none(Reports.select().where(Reports.store == self).order_by(Reports.date.desc()))
+        return self.get_or_none(Reports.select().where(
+            Reports.store == self).order_by(Reports.date.desc()))
 
     def lasts_reports(self):
         try:
-            return Reports.select().where(Reports.store == self).order_by(Reports.date.desc()).all()
+            return Reports.select().where(Reports.store == self).order_by(
+                Reports.date.desc()).all()
         except Exception as e:
             # print("lasts_reports ", e)
             raise
@@ -89,16 +95,16 @@ class Product(BaseModel):
     @property
     def last_report(self):
         try:
-            last = report.order_by(Reports.date.desc()).get()
+            last = self.report.order_by(Reports.date.desc()).get()
         except Exception as e:
             last = None
         return last
 
     def reports(self):
         try:
-            return report.order_by(Reports.date.desc())
+            return self.report.order_by(Reports.date.desc())
         except Exception as e:
-            # print(e)
+            print(e)
             pass
 
     @property
@@ -130,60 +136,113 @@ class Reports(BaseModel):
                                 store=self.store,
                                 product=self.product)
 
+    def display_name(self):
+        return "Produit : {} >> Magasin {} \n Qtité utilisée: {} \n Date : {}".format(
+            self.product.name, self.store.name, self.qty_use, self.date)
+
     def save(self):
         """
         Calcul du remaining en stock après une operation."""
         from Common.ui.util import raise_error
-        # print("SAVE BEGIN")
+        print("SAVE BEGIN")
+
+        prev_remaining = self.get_prev_remaining()
+        # print("prev_remaining : ", prev_remaining, " EE ",
+        #       self.product.name, "M : ", self.store.name)
+        print(prev_remaining, "TTTTTTTTTTTTT")
+        if self.type_ == self.E:
+            self.remaining = int(prev_remaining) + int(self.qty_use)
+        elif self.type_ == self.S:
+            self.remaining = int(prev_remaining) - int(self.qty_use)
+        else:
+            raise_error(u"Erreur",
+                        u"Type d'opération inconnus")
+            return
+
         try:
-            try:
-                last_reports = self.last_report()
-                # print("LAST REPORT: ", last_reports)
-                previous_remaining = last_reports.remaining
-                # print("previous_remaining: ", previous_remaining)
-            except Exception as e:
-                # print("last_reports", e)
-                previous_remaining = 0
-            if self.type_ == self.E:
-                self.remaining = int(previous_remaining) + int(self.qty_use)
-            if self.type_ == self.S:
-                self.remaining = int(previous_remaining) - int(self.qty_use)
-                if self.remaining < 0:
-                    raise_error(u"Erreur",
-                                u"On peut pas utilisé %d puis qu'il ne reste que %d"
-                                % (self.qty_use, previous_remaining))
-                    return False
-        except Exception as e:
-            # print(e)
-            if self.type_ == self.S:
-                raise_error(u"Erreur",
-                            u"Il n'existe aucun %s dans le store %s"
-                            % (self.product.name, self.store.name))
-                return False
+            assert(self.remaining > 0)
+        except:
+            raise_error(
+                "Erreur",
+                "Produit : {} >> Magasin {} \n On peut pas utilisé {} puis"
+                "qu'il ne reste que {}".format(
+                    self.product.name, self.store.name,
+                    self.qty_use, prev_remaining))
+            return False
 
         super(Reports, self).save()
-        try:
-            next_rpts = self.report.order_by(Reports.date.asc())
-            next_rpt = next_rpts.get()
-            next_rpt.save()
-        except Exception as e:
-            # print("next_rpt", e)
-            pass
+
+        if self.next_rpt():
+            self.next_rpt().save()
+
     # 793O5759
+
+    def get_prev_remaining(self):
+        print("self.prev_rpt()", self.prev_rpt())
+        return 0 if not self.prev_rpt() else self.prev_rpt().remaining
+
+    @property
+    def reports_q(self):
+        return Reports.select().where(
+            Reports.product == self.product, Reports.store == self.store,
+            Reports.deleted == False)
+
+    def prev_rpt(self):
+        try:
+            # print("PREV : ", [i.date for i in self.prev_rpts()])
+            return self.prev_rpts().get()
+        except Exception as e:
+            print("prev_report ", e)
+            return None
+
+    def next_rpt(self):
+        try:
+            # print("NEXT : ", [i.date for i in self.next_rpts()])
+            return self.next_rpts().get()
+        except Exception as e:
+            print("next_rpt ", e)
+            return None
+
+    def next_rpts(self):
+        try:
+            return self.reports_q.select().where(
+                # Reports.owner == self.owner,
+                Reports.date > self.date).order_by(Reports.date.asc())
+        except Exception as e:
+            print("next_rpts ", e)
+            return None
+
+    def prev_rpts(self):
+        try:
+            return self.reports_q.select().where(
+                Reports.date < self.date).order_by(Reports.date.desc())
+        except Exception as e:
+            # print("prev_rpts : ", e)
+            return None
+
+    def deletes_data(self):
+        prev_ = self.prev_rpts()
+        next_ = self.next_rpt()
+        self.delete_instance()
+        if prev_:
+            prev_.save()
+        else:
+            if next_:
+                next_.save()
+        return
 
     def last_report(self):
         try:
-            return self.report.order_by(Reports.date.desc()).get()
+            return self.reports_q.order_by(Reports.date.desc()).get()
         except Exception as e:
             # print("last_report", e)
             return None
 
-    @property
-    def report(self):
-        return Reports.select().where(Reports.product == self.product,
-                                      Reports.store == self.store,
-                                      Reports.date < self.date,
-                                      Reports.deleted == False)
+    def recalculate(self):
+        try:
+            self.next_rpt().save()
+        except Exception as e:
+            print(e)
 
 
 class Invoice(BaseModel):

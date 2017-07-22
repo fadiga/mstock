@@ -349,7 +349,6 @@ class OrderTableWidget(FTableWidget):
 
     def refresh_(self, choix):
 
-        print(choix)
         if choix:
             self.row = [0, u"%s" % choix.name, 0, 0]
         else:
