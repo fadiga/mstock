@@ -147,7 +147,7 @@ class ResultatTableWidget(FTableWidget):
         self.hheaders = ["i", u"Produits", u"Ajouter"]
         self.stretch_columns = [1]
         self.align_map = {1: 'l', 2: 'r'}
-        self.display_fixed = True
+        # self.display_fixed = True
         self.refresh_()
 
     def refresh_(self, value=None):
@@ -156,10 +156,10 @@ class ResultatTableWidget(FTableWidget):
         self.set_data_for(value)
         self.refresh()
 
-        pw = 100
+        pw = self.width()
         self.setColumnWidth(0, 20)
-        self.setColumnWidth(1, pw * 2)
-        self.setColumnWidth(2, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, 40)
 
     def set_data_for(self, prod_find):
 
@@ -173,7 +173,7 @@ class ResultatTableWidget(FTableWidget):
         if column == 2:
             return QTableWidgetItem(QIcon(
                 u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                           img="go-next.png")), "Ajouter")
+                                           img="go-next.png")), "")
         if column == 0:
             return QTableWidgetItem(QIcon(
                 u"{img_media}{img}".format(img_media=Config.img_cmedia,
@@ -227,6 +227,7 @@ class InputTableWidget(FTableWidget):
         self.setColumnWidth(0, pw)
         self.setColumnWidth(1, pw)
         self.setColumnWidth(2, (pw * 2))
+        print(self.data)
 
     def popup(self, pos):
         if (len(self.data) - 1) < self.selectionModel().selection().indexes()[0].row():
@@ -238,9 +239,12 @@ class InputTableWidget(FTableWidget):
             try:
                 self.data.pop(self.selectionModel()
                                   .selection().indexes()[0].row())
+                self.refresh_()
             except IndexError:
                 pass
-            self.refresh_()
+            if self.data == []:
+                self._reset()
+            self.refresh()
 
     def extend_rows(self):
         nb_rows = self.rowCount()

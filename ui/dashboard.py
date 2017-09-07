@@ -166,8 +166,9 @@ class InvoiceTableWidget(FTableWidget):
                 invoices = Invoice.select().where(Invoice.number == int(value))
             except Exception as e:
                 Config.logging.error(e)
-                invoices = Invoice.select().where(Invoice.location.contains(value) |
-                                                  Invoice.client.contains(value))
+                invoices = Invoice.select().where(
+                    Invoice.location.contains(value) |
+                    Invoice.client.contains(value))
         else:
             invoices = Invoice.select().order_by(Invoice.number.asc())
 
@@ -199,12 +200,13 @@ class AlertTableWidget(FTableWidget):
     def __init__(self, parent, *args, **kwargs):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
-        self.hheaders = [u"Magasin"] if multi_store else []
-        self.hheaders += [u"Produits", u"Quantité restante",
-                          u"Date de la dernière operation"]
+        self.hheaders = [u"Magasin", "Produits", u"Quantité restante",
+                         u"Date de la dernière operation"]
 
-        self.align_map = {0: 'l', 1: 'l', 2: 'r'} if multi_store else {
-            0: 'l', 1: 'r', 2: 'r'}
+        self.stretch_columns = [0, 1, 2, 3]
+        self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r'}
+        self.display_vheaders = False
+        self.live_refresh = True
         self.sorter = True
         self.refresh_()
 
@@ -213,12 +215,12 @@ class AlertTableWidget(FTableWidget):
         self._reset()
         self.set_data_for()
         self.refresh()
+        pw = self.width() / 5
+        # self.setColumnWidth(0, pw)
+        # self.setColumnWidth(1, pw)
+        # self.setColumnWidth(2, pw)
 
     def set_data_for(self):
         reports = lastes_upper_of(10)
-        if multi_store:
-            self.data = [(rep.store.name, rep.product.name, rep.remaining,
-                          show_date(rep.date)) for rep in reports]
-        else:
-            self.data = [(rep.product.name, rep.remaining, show_date(rep.date))
-                         for rep in reports]
+        self.data = [(rep.store.name, rep.product.name, rep.remaining,
+                      show_date(rep.date)) for rep in reports]

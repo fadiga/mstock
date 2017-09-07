@@ -202,9 +202,9 @@ class ResultatTableWidget(FTableWidget):
         self.parent = parent
 
         self.hheaders = [u"info", u"Resultat", u"Ajouter"]
-        self.stretch_columns = []
+        self.stretch_columns = [1]
         self.align_map = {1: 'l'}
-        self.display_fixed = True
+        # self.display_fixed = True
         self.refresh_()
 
     def refresh_(self, value=None):
@@ -214,10 +214,10 @@ class ResultatTableWidget(FTableWidget):
         self.set_data_for(value)
         self.refresh()
 
-        pw = 100
+        pw = self.width()
         self.setColumnWidth(0, 20)
-        self.setColumnWidth(1, pw * 2)
-        self.setColumnWidth(2, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, 60)
 
     def set_data_for(self, prod_find):
 
@@ -229,11 +229,11 @@ class ResultatTableWidget(FTableWidget):
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 2:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="go-next.png")), "Ajouter")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_cmedia, img="go-next.png")), "")
         if column == 0:
-            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(img_media=Config.img_media,
-                                                                     img="info.png")), "")
+            return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
+                img_media=Config.img_cmedia, img="info.png")), "")
         return super(ResultatTableWidget, self)._item_for_data(row, column,
                                                                data, context)
 

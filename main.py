@@ -8,20 +8,21 @@ from __future__ import (
 
 import os
 import sys
-import locale
-import gettext
+# import locale
+# import gettext
 import gettext_windows
-
-sys.path.append(os.path.abspath('../'))
 
 from PyQt4.QtGui import QApplication
 
+
+sys.path.append(os.path.abspath('../'))
+
 from database import setup
+from ui.mainwindow import MainWindow
 from Common.ui.window import FWindow
 from Common.ui.qss import appStyle
 from Common.cmain import cmain
 
-from ui.mainwindow import MainWindow
 
 app = QApplication(sys.argv)
 
@@ -29,14 +30,14 @@ app = QApplication(sys.argv)
 def main():
     """  """
     gettext_windows.setup_env()
-    locale.setlocale(locale.LC_ALL, '')
+    # locale.setlocale(locale.LC_ALL, '')
     # gettext.install('mmain', localedir='locale', unicode=True)
-    gettext.install('main.py', localedir='locale')
+    # gettext.install('main.py', localedir='locale')
     window = MainWindow()
     window.setStyleSheet(appStyle)
     setattr(FWindow, 'window', window)
-    # window.show()
-    window.showMaximized()
+    window.show()
+    # window.showMaximized()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

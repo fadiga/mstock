@@ -137,18 +137,18 @@ class ResultatTableWidget(FTableWidget):
         self.parent = parent
 
         self.hheaders = [u"i", u"Resultat", u"Ajouter"]
-        self.stretch_columns = [1, 2]
+        self.stretch_columns = [1]
         self.align_map = {1: 'l'}
-        self.display_fixed = True
+        # self.display_fixed = True
         # self.display_vheaders = False
         self.refresh_()
 
     def refresh_(self, value=None):
         """ """
-        pw = 100
+        pw = self.width()
         self.setColumnWidth(0, 20)
-        self.setColumnWidth(1, pw * 2)
-        self.setColumnWidth(2, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, 40)
         self._reset()
         self.set_data_for(value)
         self.refresh()
@@ -167,7 +167,7 @@ class ResultatTableWidget(FTableWidget):
         if column == 2:
             return QTableWidgetItem(
                 QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
-                                                 img="go-next.png")), "Ajouter")
+                                                 img="go-next.png")), "")
         if column == 0:
             return QTableWidgetItem(
                 QIcon(u"{img_media}{img}".format(img_media=Config.img_cmedia,
@@ -235,7 +235,9 @@ class InproductTableWidget(FTableWidget):
                                   .selection().indexes()[0].row())
             except IndexError:
                 pass
-            self.refresh_()
+            if self.data == []:
+                self._reset()
+            self.refresh()
 
     def extend_rows(self):
         nb_rows = self.rowCount()

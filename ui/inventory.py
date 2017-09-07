@@ -62,7 +62,7 @@ class InventoryViewWidget(FWidget):
 
     def export_xls(self):
         dict_data = {
-            'file_name': "inventaire.xls",
+            'file_name': "inventaire.xlsx",
             'headers': self.invent_table.hheaders,
             'data': self.invent_table.data,
             'sheet': self.title,

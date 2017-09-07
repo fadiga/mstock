@@ -3,12 +3,12 @@
 # maintainer: Fad
 
 
-from PyQt4.QtGui import QVBoxLayout
+from PyQt4.QtGui import QVBoxLayout, QGridLayout
 
 from configuration import Config
 from models import (Store, Product, Reports)
 
-from Common.ui.common import (FWidget, FLabel)
+from Common.ui.common import (FWidget, FLabel, BttExportPDF)
 from Common.ui.util import formatted_number, show_date
 from Common.ui.table import FTableWidget
 
@@ -18,19 +18,41 @@ class ReportForStoreWidget(FWidget):
     def __init__(self, store="", parent=0, *args, **kwargs):
         super(ReportForStoreWidget, self).__init__(
             parent=parent, *args, **kwargs)
-        title = u"<h1> Situation du : <i>{}</i></h1>".format(store)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + title)
+        self.title = u"<h1> Situation du : <i>{}</i></h1>".format(store)
+        self.parentWidget().setWindowTitle(Config.NAME_ORGA + self.title)
         self.parent = parent
         self.store = store
 
         self.table_resultat = ReportTableWidget(parent=self)
 
-        self.prod_label = FLabel(title)
+        self.prod_label = FLabel(self.title)
+        self.btt_export = BttExportPDF(u"Exporter")
+        self.btt_export.clicked.connect(self.export_pdf)
+        gridbox = QGridLayout()
+        gridbox.setColumnStretch(7, 2)
+        gridbox.addWidget(self.btt_export, 0, 8)
 
         vbox = QVBoxLayout(self)
         vbox.addWidget(self.prod_label)
+        vbox.addLayout(gridbox)
         vbox.addWidget(self.table_resultat)
         self.setLayout(vbox)
+
+    def export_pdf(self):
+
+        from Common.exports_pdf import export_dynamic_data
+        from datetime import datetime
+
+        dict_data = {
+            'title': "Situation du : {}".format(self.store),
+            'file_name': "report_store.pdf",
+            'headers': self.table_resultat.hheaders,
+            'data': self.table_resultat.data,
+            'date': show_date(datetime.now()),
+            'sheet': self.title,
+            'widths': self.table_resultat.stretch_columns
+        }
+        export_dynamic_data(dict_data)
 
 
 class ReportTableWidget(FTableWidget):
@@ -91,5 +113,5 @@ class ReportTableWidget(FTableWidget):
 
         self.data = [(rep.get('prod'), rep.get('last_remaining_box'),
                       rep.get('last_remaining_p'), show_date(
-                          rep.get('last_op'))) for rep in reports]
+            rep.get('last_op'))) for rep in reports]
         self.refresh()

@@ -71,14 +71,6 @@ def pdFview(filename, invoice):
             p.drawString(x + 340, y, str(i.price).rjust(10, ' '))
             p.drawString(x + 430, y, str(i.price * i.quantity).rjust(10, ' '))
             y -= 20
-        # on teste le type
-        if invoice.type_ == "Facture":
-            p.drawString(59, 80, "Pour acquit: ")
-        else:
-            p.drawString(59, 80, "Pour acceptation: ")
-
-        p.drawString(435, 80, "Le fournisseur: ")
-        # On calcul le montant total hors taxe et sa conversion en lettre
         ht = 0
         for i in items_invoice:
             montant = i.price * i.quantity
