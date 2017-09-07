@@ -18,13 +18,14 @@ from Common.ui.util import (
 
 class GReportViewWidget(FWidget):
 
-    def __init__(self, parent=0, *args, **kwargs):
+    def __init__(self, store=None, parent=0, *args, **kwargs):
         super(GReportViewWidget, self).__init__(parent=parent,
                                                 *args, **kwargs)
         self.parentWidget().setWindowTitle(Config.NAME_ORGA +
                                            u"    GESTION DES RAPPORTS")
         self.parent = parent
         self.title = u"Tous les mouvements"
+        self.store = store
         tablebox = QVBoxLayout()
         self.on_date = FormatDate(QDate(date.today().year, 1, 1))
         self.end_date = FormatDate(QDate.currentDate())
@@ -43,12 +44,15 @@ class GReportViewWidget(FWidget):
         gridbox.addWidget(self.Button, 0, 6)
         gridbox.setColumnStretch(7, 5)
         self.text_format = "Les mouvements du {} au {}"
+        self.store_label = FPageTitle("Magasin : {}".format(
+            self.store if self.store else "Tous"))
         self.period_label = FPageTitle(self.text_format.format(
             show_date(self.on_date.text(), time=False),
             show_date(self.end_date.text(), time=False)))
         self.refresh_()
 
         vbox = QVBoxLayout()
+        vbox.addWidget(self.store_label)
         vbox.addWidget(self.period_label)
         # vbox.addWidget(FormLabel(period))
         vbox.addLayout(gridbox)
@@ -78,7 +82,6 @@ class GReportTableWidget(FTableWidget):
         self.setMouseTracking(True)
         self.current_hover = [0, 0]
         # self.cellEntered.connect(self.cellHover)
-
         self.stretch_columns = [1, 2, 5]
         self.align_map = {0: 'l', 1: "l", 2: "l", 3: "r", 4: "r"}
         self.ecart = 144
@@ -99,14 +102,19 @@ class GReportTableWidget(FTableWidget):
 
         on = date_on_or_end(self.parent.on_date.text()),
         end = date_on_or_end(self.parent.end_date.text(), on=False)
+        reports = Reports.filter(
+            deleted=False, date__gte=on, date__lte=end)
+        if self.parent.store:
+            reports = reports.filter(store=self.parent.store)
 
         self.data = [(rap.type_, rap.store.name, rap.product,
                       formatted_number(rap.qty_use),
                       formatted_number(rap.remaining),
                       show_date(rap.date), rap.id)
-                     for rap in Reports.filter(
-            deleted=False, date__gte=on, date__lte=end).order_by(
-            Reports.date.desc(), Reports.store.desc(), Reports.product.desc())]
+                     for rap in reports.order_by(
+            Reports.date.desc(), Reports.store.desc(),
+            Reports.product.desc())]
+        self.refresh()
 
     def _item_for_data(self, row, column, data, context=None):
         if column == 0 and self.data[row][0] == Reports.E:
