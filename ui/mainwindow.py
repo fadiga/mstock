@@ -9,15 +9,15 @@ from __future__ import (
 from PyQt4.QtGui import QIcon
 from PyQt4.QtCore import Qt
 
-from Common.ui.common import FMainWindow, QToolBadgeButton, QBadgeButton
+from Common.ui.common import FMainWindow, QToolBadgeButton
 
-from models import Owner
-from configuration import Config
 
 from ui.menutoolbar import MenuToolBar
 from ui.menubar import MenuBar
-from ui.statusbar import GStatusBar
+from Common.ui.statusbar import GStatusBar
 from ui.dashboard import DashbordViewWidget
+
+from configuration import Config
 
 
 class MainWindow(FMainWindow):
@@ -25,8 +25,8 @@ class MainWindow(FMainWindow):
     def __init__(self):
         FMainWindow.__init__(self)
 
-        self.setWindowIcon(QIcon.fromTheme('logo',
-                                           QIcon(u"{}".format(Config.APP_LOGO))))
+        self.setWindowIcon(QIcon.fromTheme(
+            'logo', QIcon(u"{}".format(Config.APP_LOGO))))
         self.menubar = MenuBar(self)
         self.setMenuBar(self.menubar)
         self.toolbar = MenuToolBar(self)

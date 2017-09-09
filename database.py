@@ -25,4 +25,4 @@ def setup(drop_tables=False):
         from fixture import fixt_init
         fixt_init().creat_all_or_pass()
 
-setup()
+# setup()

@@ -7,12 +7,11 @@ from datetime import date
 from PyQt4 import QtGui, QtCore
 
 from configuration import Config
-from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
+from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLSX,
                               Button, FormatDate)
 from database import Reports, Product
 from Common.ui.table import FTableWidget
-from Common.ui.util import formatted_number, is_int, date_on_or_end
-from Common.exports_xlsx import export_dynamic_data
+from Common.ui.util import is_int, date_on_or_end
 
 
 class InventoryViewWidget(FWidget):
@@ -24,7 +23,8 @@ class InventoryViewWidget(FWidget):
         self.parent = parent
 
         self.title = u"Inventaire des articles"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + " " + self.title)
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, self.title))
 
         self.invent_table = InventoryTableWidget(parent=self)
 
@@ -33,9 +33,9 @@ class InventoryViewWidget(FWidget):
         # self.end_date.textChanged.connect(self.finder)
         self.btt_ok = Button(u"Ok")
         self.btt_ok.clicked.connect(self.rapport_filter)
-        self.btt_export = BttExportXLS(u"Exporter")
-        self.btt_export.clicked.connect(self.export_xls)
-        self.btt_export.setEnabled(False)
+        self.btt_export_xlsx = BttExportXLSX(u"")
+        self.btt_export_xlsx.clicked.connect(self.export_xlsx)
+        self.btt_export_xlsx.setEnabled(False)
         vbox = QtGui.QVBoxLayout()
         # Grid
         gridbox = QtGui.QGridLayout()
@@ -45,7 +45,7 @@ class InventoryViewWidget(FWidget):
         gridbox.addWidget(self.end_date, 0, 4)
         gridbox.addWidget(self.btt_ok, 0, 5)
         gridbox.setColumnStretch(7, 2)
-        gridbox.addWidget(self.btt_export, 0, 8)
+        gridbox.addWidget(self.btt_export_xlsx, 0, 8)
         vbox.addWidget(FPageTitle(u"<h2> {} <h2>".format(self.title)))
         vbox.addLayout(gridbox)
         vbox.addWidget(self.invent_table)
@@ -55,14 +55,15 @@ class InventoryViewWidget(FWidget):
         self.invent_table.refresh()
 
     def rapport_filter(self):
-        self.btt_export.setEnabled(True)
+        self.btt_export_xlsx.setEnabled(True)
         self.invent_table.refresh_(on=date_on_or_end(self.on_date.text()),
                                    end=date_on_or_end(self.end_date.text(),
                                                       on=False))
 
-    def export_xls(self):
+    def export_xlsx(self):
+        from Common.exports_xlsx import export_dynamic_data
         dict_data = {
-            'file_name': "inventaire.xlsx",
+            'file_name': "inventaire",
             'headers': self.invent_table.hheaders,
             'data': self.invent_table.data,
             'sheet': self.title,

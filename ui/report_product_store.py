@@ -21,7 +21,8 @@ class ReportProductStoreWidget(FWidget):
         super(ReportProductStoreWidget, self).__init__(
             parent=parent, *args, **kwargs)
         title = u" <h1> Situation </h1>"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + title)
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, title))
         self.parent = parent
 
         vbox = QVBoxLayout(self)
@@ -124,7 +125,7 @@ class ReportTableWidget(FTableWidget):
 
             self.data = [(rep.get('store'), rep.get('last_remaining_box'),
                           rep.get('last_remaining_p'), show_date(
-                              rep.get('last_op'))) for rep in reports]
+                rep.get('last_op'))) for rep in reports]
             self.refresh()
 
     # def click_item(self, row, column, *args):

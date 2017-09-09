@@ -25,7 +25,8 @@ class By_productViewWidget(FWidget, FPeriodHolder):
 
         self.table_p = table_p
 
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      Par product")
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, "Par product"))
 
         product = Product.select().where(Product.name.contains(product)).get()
 

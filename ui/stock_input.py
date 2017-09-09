@@ -21,32 +21,34 @@ from GCommon.ui._product_detail import InfoTableWidget
 
 class StockInputWidget(FWidget):
 
-    def __init__(self, product="", parent=0, *args, **kwargs):
+    def __init__(self, store="", parent=0, *args, **kwargs):
         super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
         title = u"   ENTREE STOCK"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + title)
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, title))
         Config.logging.info(title)
         self.parent = parent
-
+        self.store = store
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         editbox = QGridLayout()
 
         self.date = FormatDate(QDate.currentDate())
 
-        # Combobox widget for add store
         self.liste_store = Store.all()
 
         self.box_mag = QComboBox()
         for index in range(0, len(self.liste_store)):
             op = self.liste_store[index]
-            sentence = u"%(name)s" % {'name': op.name}
-            self.box_mag.addItem(sentence, op.id)
+            self.box_mag.addItem(op.name, op.id)
+
+            if self.store and self.store.name == op.name:
+                self.box_mag.setCurrentIndex(index)
 
         self.search_field = QLineEdit()
         self.search_field.setPlaceholderText("Rechercher un article")
-        self.search_field.setMaximumSize(200,
-                                         self.search_field.maximumSize().height())
+        self.search_field.setMaximumSize(
+            200, self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
         self.add_prod = Button(u"+ &Article")
@@ -129,7 +131,7 @@ class StockInputWidget(FWidget):
                 rep.save()
             except:
                 self.parent.Notify(
-                    u"Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
+                    "Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
                 return False
 
         self.parent.change_context(GReportViewWidget)
@@ -195,7 +197,7 @@ class InputTableWidget(FTableWidget):
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
         self.parent = parent
 
-        self.hheaders = [u"Quantité (carton)", "Nombre pièce", u"Désignation"]
+        self.hheaders = ["Quantité (carton)", "Nombre pièce", "Désignation"]
         # self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
@@ -212,7 +214,8 @@ class InputTableWidget(FTableWidget):
     def refresh_(self, choix=None):
         if choix:
             self.row = [1, choix.number_parts_box, u"%s" % choix.name]
-            if not [row for row in self.data if self.row[self.col_dest] in row]:
+            if not [row for row in self.data if self.row[
+                    self.col_dest] in row]:
                 self.set_data_for()
                 self.refresh()
             self.refresh()
@@ -227,10 +230,10 @@ class InputTableWidget(FTableWidget):
         self.setColumnWidth(0, pw)
         self.setColumnWidth(1, pw)
         self.setColumnWidth(2, (pw * 2))
-        print(self.data)
 
     def popup(self, pos):
-        if (len(self.data) - 1) < self.selectionModel().selection().indexes()[0].row():
+        if (len(self.data) - 1) < self.selectionModel().selection().indexes(
+        )[0].row():
             return False
         menu = QMenu()
         quit_action = menu.addAction("Supprimer cette ligne")
@@ -286,11 +289,12 @@ class InputTableWidget(FTableWidget):
     def changed_value(self, refresh=False):
         """ Calcule les Resultat """
         self.isvalid = True
-        for row_num in xrange(0, self.data.__len__()):
+        for row_num in range(0, self.data.__len__()):
 
             qtsaisi = is_int(self.cellWidget(row_num, self.col_qtty).text())
             nb_parts_box = Product.filter(name=self.item(
-                row_num, self.col_dest).text()).get().number_parts_box * qtsaisi
+                row_num, self.col_dest).text()).get(
+            ).number_parts_box * qtsaisi
 
             viderreur_qtsaisi = ""
             if qtsaisi == 0:

@@ -9,7 +9,7 @@ from PyQt4.QtCore import Qt, QDate, SIGNAL
 
 from configuration import Config
 from Common.ui.util import raise_error, date_to_datetime
-from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLS,
+from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLSX,
                               IntLineEdit, Button_save, FormatDate, Deleted_btt,
                               QLineEdit)
 from Common.ui.table import FTableWidget
@@ -25,7 +25,8 @@ class OrderViewWidget(FWidget):
     def __init__(self, parent=0, *args, **kwargs):
         super(OrderViewWidget, self).__init__(parent=parent, *args, **kwargs)
 
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"    COMMANDE")
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, "COMMANDE"))
         self.parent = parent
 
         self.title = FPageTitle("<h1> Faire une Commande </h1>")
@@ -33,7 +34,7 @@ class OrderViewWidget(FWidget):
         vbox = QVBoxLayout()
         self.order_table = OrederTableWidget(parent=self)
 
-        self.export_xls_btt = BttExportXLS(u"Exporter")
+        self.export_xls_btt = BttExportXLSX("")
         self.connect(self.export_xls_btt, SIGNAL('clicked()'),
                      self.export_xls_order)
 

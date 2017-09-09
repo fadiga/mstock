@@ -22,12 +22,12 @@ from models import (Store, Product, Reports)
 
 class StockOutputWidget(FWidget):
 
-    def __init__(self, product="", parent=0, *args, **kwargs):
+    def __init__(self, store="", parent=0, *args, **kwargs):
         super(StockOutputWidget, self).__init__(parent=parent, *args, **kwargs)
         self.parentWidget().setWindowTitle(
-            Config.NAME_ORGA + u"      SORTIE STOCK ")
+            "{} {}".format(Config.NAME_ORG, "SORTIE STOCK "))
         self.parent = parent
-
+        self.store = store
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         editbox = QGridLayout()
@@ -38,10 +38,11 @@ class StockOutputWidget(FWidget):
         self.liste_store = Store.all()
 
         self.box_store = QComboBox()
-        for index in xrange(0, len(self.liste_store)):
+        for index in range(0, len(self.liste_store)):
             op = self.liste_store[index]
-            sentence = u"{name}".format(name=op.name)
-            self.box_store.addItem(sentence, op.id)
+            self.box_store.addItem(op.name, op.id)
+            if self.store and self.store.name == op.name:
+                self.box_store.setCurrentIndex(index)
 
         self.search_field = QLineEdit()
         self.search_field.setPlaceholderText("Rechercher un article")
@@ -120,7 +121,8 @@ class StockOutputWidget(FWidget):
                 rep.save()
             except:
                 self.parent.Notify(
-                    u"Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
+                    u"Ce mouvement n'a pas pu être enrgistré dans les raports",
+                    "error")
                 return False
 
         self.parent.change_context(GReportViewWidget)
@@ -190,7 +192,7 @@ class InproductTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [u"Quantité (carton)", "Nombre pièce", u"Désignation"]
+        self.hheaders = ["Quantité (carton)", "Nombre pièce", "Désignation"]
 
         # self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -208,7 +210,8 @@ class InproductTableWidget(FTableWidget):
     def refresh_(self, choix=None):
         if choix:
             self.row = [1, choix.number_parts_box, choix.name]
-            if not [row for row in self.data if self.row[self.col_dest] in row]:
+            if not [row for row in self.data if self.row[
+                    self.col_dest] in row]:
                 self.set_data_for()
                 self.refresh()
             self.refresh()
@@ -224,7 +227,8 @@ class InproductTableWidget(FTableWidget):
         self.setColumnWidth(2, (pw * 2))
 
     def popup(self, pos):
-        if (len(self.data) - 1) < self.selectionModel().selection().indexes()[0].row():
+        if (len(self.data) - 1) < self.selectionModel().selection().indexes(
+        )[0].row():
             return False
         menu = QMenu()
         quit_action = menu.addAction("Supprimer cette ligne")
@@ -283,7 +287,7 @@ class InproductTableWidget(FTableWidget):
 
         self.button.setEnabled(True)
         self.isvalid = True
-        for row_num in xrange(0, self.data.__len__()):
+        for row_num in range(0, self.data.__len__()):
             qtsaisi = is_int(self.cellWidget(row_num, self.col_qtty).text())
 
             nb_parts_box = Product.filter(
@@ -316,7 +320,7 @@ class InproductTableWidget(FTableWidget):
 
             viderreur_qtsaisi = ""
             stylerreur = "background-color: rgb(255, 235, 235);" + \
-                         "border: 3px double SeaGreen"
+                "border: 3px double SeaGreen"
             if qtsaisi == 0:
                 viderreur_qtsaisi = stylerreur
                 self.cellWidget(row_num, self.col_qtty).setToolTip(
@@ -331,7 +335,9 @@ class InproductTableWidget(FTableWidget):
             if qtremaining < qtsaisi:
                 self.cellWidget(row_num, self.col_qtty).setStyleSheet(
                     "font-size:20px; color: red")
-                self.cellWidget(row_num, self.col_qtty).setToolTip(
-                    u"{} est > {} la quantité restante.".format(qtsaisi, qtremaining))
+                self.cellWidget(
+                    row_num, self.col_qtty).setToolTip(
+                    u"{} est > {} la quantité restante.".format(
+                        qtsaisi, qtremaining))
                 self.isvalid = False
                 # self.button.setEnabled(False)

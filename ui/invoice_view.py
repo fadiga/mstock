@@ -22,7 +22,8 @@ class InvoiceViewWidget(FWidget):
 
     def __init__(self, product="", parent=0, *args, **kwargs):
         super(InvoiceViewWidget, self).__init__(parent=parent, *args, **kwargs)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + u"      FACTURATION")
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, "FACTURATION"))
         self.parent = parent
 
         vbox = QVBoxLayout(self)

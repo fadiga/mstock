@@ -3,13 +3,14 @@
 # maintainer: Fad
 
 
-from PyQt4.QtGui import QVBoxLayout, QGridLayout
+from PyQt4.QtGui import QVBoxLayout, QGridLayout, QIcon, QPushButton
 
+from datetime import datetime
 from configuration import Config
 from models import (Store, Product, Reports)
 
-from Common.ui.common import (FWidget, FLabel, BttExportPDF)
-from Common.ui.util import formatted_number, show_date
+from Common.ui.common import (FWidget, FLabel, BttExportPDF, BttExportXLSX)
+from Common.ui.util import show_date
 from Common.ui.table import FTableWidget
 
 
@@ -19,18 +20,30 @@ class ReportForStoreWidget(FWidget):
         super(ReportForStoreWidget, self).__init__(
             parent=parent, *args, **kwargs)
         self.title = u"<h1> Situation du : <i>{}</i></h1>".format(store)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + self.title)
+        self.parentWidget().set_window_title("Magasin {}".format(store))
         self.parent = parent
-        self.store = store
+        self.store = Store.get(name=store)
 
         self.table_resultat = ReportTableWidget(parent=self)
 
         self.prod_label = FLabel(self.title)
-        self.btt_export = BttExportPDF(u"Exporter")
-        self.btt_export.clicked.connect(self.export_pdf)
+        self.btt_input = QPushButton(QIcon.fromTheme(
+            '', QIcon(u"{}in.png".format(Config.img_media))), u"Entrée")
+        self.btt_input.clicked.connect(self.goto_input)
+        self.btt_output = QPushButton(QIcon.fromTheme(
+            '', QIcon(u"{}out.png".format(Config.img_media))), u"Sortie")
+        self.btt_output.clicked.connect(self.goto_output)
+
+        self.btt_export_pdf = BttExportPDF("")
+        self.btt_export_pdf.clicked.connect(self.export_pdf)
+        self.btt_export_xlsx = BttExportXLSX("")
+        self.btt_export_xlsx.clicked.connect(self.export_xlsx)
         gridbox = QGridLayout()
+        gridbox.addWidget(self.btt_input, 0, 1)
+        gridbox.addWidget(self.btt_output, 0, 2)
         gridbox.setColumnStretch(7, 2)
-        gridbox.addWidget(self.btt_export, 0, 8)
+        gridbox.addWidget(self.btt_export_pdf, 0, 8)
+        gridbox.addWidget(self.btt_export_xlsx, 0, 9)
 
         vbox = QVBoxLayout(self)
         vbox.addWidget(self.prod_label)
@@ -38,21 +51,23 @@ class ReportForStoreWidget(FWidget):
         vbox.addWidget(self.table_resultat)
         self.setLayout(vbox)
 
+    def goto_input(self):
+        from ui.stock_input import StockInputWidget
+        self.change_main_context(StockInputWidget, store=self.store)
+
+    def goto_output(self):
+        from ui.stock_output import StockOutputWidget
+        self.change_main_context(StockOutputWidget, store=self.store)
+
     def export_pdf(self):
 
         from Common.exports_pdf import export_dynamic_data
-        from datetime import datetime
+        export_dynamic_data(self.table_resultat.dict_data())
 
-        dict_data = {
-            'title': "Situation du : {}".format(self.store),
-            'file_name': "report_store.pdf",
-            'headers': self.table_resultat.hheaders,
-            'data': self.table_resultat.data,
-            'date': show_date(datetime.now()),
-            'sheet': self.title,
-            'widths': self.table_resultat.stretch_columns
-        }
-        export_dynamic_data(dict_data)
+    def export_xlsx(self):
+
+        from Common.exports_xlsx import export_dynamic_data
+        export_dynamic_data(self.table_resultat.dict_data())
 
 
 class ReportTableWidget(FTableWidget):
@@ -61,8 +76,8 @@ class ReportTableWidget(FTableWidget):
 
         FTableWidget.__init__(self, parent=parent, *args, **kwargs)
 
-        self.hheaders = ["Produit",
-                         "Restante(carton)", "Restante (pièce)", "Date"]
+        self.hheaders = [
+            "Produit", "Restante(carton)", "Restante (pièce)", "Date"]
 
         self.parent = parent
         self.store = parent.store
@@ -88,16 +103,11 @@ class ReportTableWidget(FTableWidget):
     def set_data_for(self):
 
         reports = []
-        try:
-            store = Store.get(name=self.store)
-        except Exception as e:
-            print(e)
-            return
 
         for prod in Product.select().order_by(Product.name):
             try:
                 repts = Reports.select().where(
-                    Reports.store == store, Reports.product == prod
+                    Reports.store == self.store, Reports.product == prod
                 ).order_by(-Reports.date)[0]
                 remaining = repts.remaining
                 last_op = repts.date
@@ -105,9 +115,8 @@ class ReportTableWidget(FTableWidget):
                 continue
             dict_store = {}
             dict_store["prod"] = prod.name
-            dict_store["last_remaining_box"] = formatted_number(remaining)
-            dict_store["last_remaining_p"] = formatted_number(
-                remaining * prod.number_parts_box)
+            dict_store["last_remaining_box"] = remaining
+            dict_store["last_remaining_p"] = remaining * prod.number_parts_box
             dict_store["last_op"] = last_op
             reports.append(dict_store)
 
@@ -115,3 +124,15 @@ class ReportTableWidget(FTableWidget):
                       rep.get('last_remaining_p'), show_date(
             rep.get('last_op'))) for rep in reports]
         self.refresh()
+
+    def dict_data(self):
+
+        return {
+            'title': "Situation du {}".format(self.store),
+            'file_name': "report_store",
+            'headers': self.hheaders,
+            'data': self.data,
+            'date': show_date(datetime.now()),
+            'sheet': self.store.name,
+            'widths': self.stretch_columns
+        }

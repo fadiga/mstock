@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fadiga
 
-from datetime import date
+from datetime import date, datetime
 from PyQt4.QtCore import Qt, QDate
-from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QTableWidgetItem,
-                         QIcon, QMenu)
+from PyQt4.QtGui import (
+    QVBoxLayout, QGridLayout, QTableWidgetItem, QIcon, QMenu)
 
 from configuration import Config
 from models import Reports, Store
-from Common.ui.common import (FWidget, FPageTitle, FormatDate, Button,
-                              FormLabel)
+from Common.ui.common import (
+    FWidget, FPageTitle, FormatDate, Button, BttExportPDF, BttExportXLSX, FormLabel)
 from Common.ui.table import FTableWidget
 from Common.ui.util import (
-    formatted_number, raise_error, date_on_or_end, show_date)
+    raise_error, date_on_or_end, show_date)
 
 
 class GReportViewWidget(FWidget):
@@ -21,16 +21,20 @@ class GReportViewWidget(FWidget):
     def __init__(self, store=None, parent=0, *args, **kwargs):
         super(GReportViewWidget, self).__init__(parent=parent,
                                                 *args, **kwargs)
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA +
-                                           u"    GESTION DES RAPPORTS")
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, "GESTION DES RAPPORTS"))
         self.parent = parent
         self.title = u"Tous les mouvements"
         self.store = store
         tablebox = QVBoxLayout()
         self.on_date = FormatDate(QDate(date.today().year, 1, 1))
         self.end_date = FormatDate(QDate.currentDate())
-        self.Button = Button(u"OK")
-        self.Button.clicked.connect(self.refresh_)
+        self.button = Button(u"OK")
+        self.button.clicked.connect(self.refresh_)
+        self.btt_export_pdf = BttExportPDF("")
+        self.btt_export_pdf.clicked.connect(self.export_pdf)
+        self.btt_export_xlsx = BttExportXLSX("")
+        self.btt_export_xlsx.clicked.connect(self.export_xlsx)
         self.table_op = GReportTableWidget(parent=self)
         tablebox.addWidget(self.table_op)
 
@@ -41,8 +45,11 @@ class GReportViewWidget(FWidget):
         gridbox.addWidget(self.on_date, 0, 3)
         gridbox.addWidget(FormLabel("Fin"), 0, 4)
         gridbox.addWidget(self.end_date, 0, 5)
-        gridbox.addWidget(self.Button, 0, 6)
-        gridbox.setColumnStretch(7, 5)
+        gridbox.addWidget(self.button, 0, 6)
+        gridbox.setColumnStretch(7, 7)
+        gridbox.addWidget(self.btt_export_pdf, 0, 8)
+        gridbox.addWidget(self.btt_export_xlsx, 0, 9)
+
         self.text_format = "Les mouvements du {} au {}"
         self.store_label = FPageTitle("Magasin : {}".format(
             self.store if self.store else "Tous"))
@@ -58,6 +65,36 @@ class GReportViewWidget(FWidget):
         vbox.addLayout(gridbox)
         vbox.addLayout(tablebox)
         self.setLayout(vbox)
+
+    def export_pdf(self):
+
+        from Common.exports_pdf import export_dynamic_data
+
+        dict_data = {
+            'title': "Mouvements du Magasion : {}".format(self.store),
+            'file_name': "Mouvements-{}".format(self.store),
+            'headers': self.table_op.hheaders[:-1],
+            'data': self.table_op.data,
+            "date": "Du {} au {}".format(
+                self.on_date.text(), self.end_date.text()),
+            'sheet': self.title,
+            'widths': self.table_op.stretch_columns
+        }
+        export_dynamic_data(dict_data)
+
+    def export_xlsx(self):
+        from Common.exports_xlsx import export_dynamic_data
+
+        dict_data = {
+            'file_name': "Mouvements-{}".format(self.store),
+            'headers': self.table_op.hheaders[:-1],
+            'data': self.table_op.data,
+            'sheet': self.title,
+            'widths': self.table_op.stretch_columns,
+            "date": "Du {} au {}".format(
+                self.on_date.text(), self.end_date.text()),
+        }
+        export_dynamic_data(dict_data)
 
     def refresh_(self):
         self.table_op.refresh_()
@@ -107,9 +144,8 @@ class GReportTableWidget(FTableWidget):
         if self.parent.store:
             reports = reports.filter(store=self.parent.store)
 
-        self.data = [(rap.type_, rap.store.name, rap.product,
-                      formatted_number(rap.qty_use),
-                      formatted_number(rap.remaining),
+        self.data = [(rap.type_, rap.store.name, rap.product.name,
+                      rap.qty_use, rap.remaining,
                       show_date(rap.date), rap.id)
                      for rap in reports.order_by(
             Reports.date.desc(), Reports.store.desc(),

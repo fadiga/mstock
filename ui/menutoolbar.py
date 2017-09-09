@@ -73,8 +73,9 @@ class MenuToolBar(QToolBar, FWidget):
 
         for m in menu:
             self.addSeparator()
-            self.addAction(QIcon("{}{}.png".format(Config.img_media, m.get('icon'))),
-                           m.get('name'), lambda m=m: self.goto(m.get('goto')))
+            self.addAction(QIcon(
+                "{}{}.png".format(Config.img_media, m.get('icon'))),
+                m.get('name'), lambda m=m: self.goto(m.get('goto')))
 
     def goto(self, goto):
         self.change_main_context(goto)

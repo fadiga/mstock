@@ -21,7 +21,8 @@ class StateStockViewWidget(FWidget, FPeriodHolder):
         FPeriodHolder.__init__(self, *args, **kwargs)
 
         self.title = u"     Les Activités"
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA + self.title)
+        self.parentWidget().setWindowTitle(
+            "{} > {}".format(Config.APP_NAME, self.title))
         self.parent = parent
 
         self.table = ReportTableWidget(parent=self, main_date=self.main_date)
