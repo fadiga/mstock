@@ -29,8 +29,7 @@ class DashbordViewWidget(FWidget):
         super(DashbordViewWidget, self).__init__(
             parent=parent, *args, **kwargs)
 
-        self.parentWidget().setWindowTitle(
-            Config.APP_NAME + u"    TABLEAU DE BORD")
+        self.parentWidget().set_window_title("TABLEAU DE BORD")
 
         self.parent = parent
         vbox = QVBoxLayout()
@@ -62,9 +61,9 @@ class DashbordViewWidget(FWidget):
         # table_invoice.addWidget(self.title_invoice)
         # table_mouvement.addWidget(self.title_mouvement)
         table_mouvement.addWidget(self.table_mouvement)
-        tab_widget = tabbox((table_alert, u"Alertes sur les produits"),
-                            (table_mouvement, u"Les Mouvements"),
-                            (table_invoice, u"Les Factures"))
+        tab_widget = tabbox((table_mouvement, u"Mouvements d'aujourd'hui"),
+                            (table_invoice, u"Factures"),
+                            (table_alert, u"Alerte"))
 
         vbox.addWidget(self.title)
         vbox.addWidget(tab_widget)
@@ -207,7 +206,7 @@ class AlertTableWidget(FTableWidget):
         self.align_map = {0: 'l', 1: 'l', 2: 'l', 3: 'r'}
         self.display_vheaders = False
         self.live_refresh = True
-        self.sorter = True
+        # self.sorter = True
         self.refresh_()
 
     def refresh_(self):
@@ -216,9 +215,9 @@ class AlertTableWidget(FTableWidget):
         self.set_data_for()
         self.refresh()
         pw = self.width() / 5
-        # self.setColumnWidth(0, pw)
-        # self.setColumnWidth(1, pw)
-        # self.setColumnWidth(2, pw)
+        self.setColumnWidth(0, pw)
+        self.setColumnWidth(1, pw)
+        self.setColumnWidth(2, pw)
 
     def set_data_for(self):
         reports = lastes_upper_of(10)

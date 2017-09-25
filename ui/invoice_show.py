@@ -4,8 +4,8 @@
 from __future__ import (
     unicode_literals, absolute_import, division, print_function)
 
-from PyQt4.QtGui import (QVBoxLayout, QTableWidgetItem,
-                         QIcon, QGridLayout, QMessageBox, QPushButton)
+from PyQt4.QtGui import (
+    QVBoxLayout, QTableWidgetItem, QIcon, QGridLayout, QMessageBox)
 from PyQt4.QtCore import Qt
 
 from configuration import Config
@@ -14,7 +14,7 @@ from tools.export_pdf import pdFview
 from tools.export_xls import write_invoice_xls
 from Common.ui.util import formatted_number, is_int, uopen_file
 from Common.ui.common import (
-    FWidget, FPageTitle, FLabel, Deleted_btt)
+    FWidget, FPageTitle, FLabel, Deleted_btt, BttExportXLSX, BttExportPDF)
 from Common.ui.table import FTableWidget
 
 
@@ -26,8 +26,8 @@ class ShowInvoiceViewWidget(FWidget):
 
         self.invoice = invoice
 
-        self.parentWidget().setWindowTitle(Config.NAME_ORGA +
-                                           u" CONSULTATION DE FACTURE")
+        self.parentWidget().setWindowTitle(
+            "{} {}".format(Config.APP_NAME, "CONSULTATION DE FACTURE"))
 
         self.table_p = table_p
         self.parent = parent
@@ -41,16 +41,8 @@ class ShowInvoiceViewWidget(FWidget):
 
         formbox = QVBoxLayout()
         editbox = QGridLayout()
-        xls_bicon = QIcon.fromTheme(
-            '', QIcon(u"{}xls.png".format(Config.img_cmedia)))
-        pdFicon = QIcon.fromTheme(
-            '', QIcon(u"{}pdf.png".format(Config.img_cmedia)))
-        self.button_pdf = QPushButton(pdFicon, u"")
-        self.button_pdf.setFixedWidth(30)
-        self.button_pdf.setFixedHeight(30)
-        self.button_xls = QPushButton(xls_bicon, u"")
-        self.button_xls.setFixedWidth(30)
-        self.button_xls.setFixedHeight(30)
+        self.button_pdf = BttExportPDF("")
+        self.button_xls = BttExportXLSX("")
         self.button_pdf.released.connect(self.printer_pdf)
         self.button_xls.released.connect(self.printer_xls)
 

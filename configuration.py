@@ -7,6 +7,7 @@ from __future__ import (unicode_literals, absolute_import, division,
 import os
 # from static import Constants
 from Common.cstatic import CConstants
+from Common.models import Organization
 
 ROOT_DIR = os.path.dirname(os.path.abspath('__file__'))
 
@@ -51,9 +52,18 @@ class Config(CConstants):
     DOC_SUPPORT = "*.png *.jpg *.bmp"
     # # ------------------------- Organisation --------------------------#
 
-    # NAME_ORGA = u"BOUTIQUE ULTIMO"
-    # CONTACT_ORGA = u"Bamako-Rep. du Mali"
-    # TEL_ORGA = u"20229770/79429471/76422142"
-    # ADRESS_ORGA = u"Bamako bozola"
-    # BP = u"B.P:177"
-    # EMAIL_ORGA = u"ultimomalidk@yahoo.fr"
+    NAME_ORGA = u"BOUTIQUE ULTIMO"
+    CONTACT_ORGA = u"Bamako-Rep. du Mali"
+    TEL_ORGA = u"20229770/79429471/76422142"
+    ADRESS_ORGA = u"Bamako bozola"
+    BP = u"B.P:177"
+    EMAIL_ORGA = u"ultimomalidk@yahoo.fr"
+
+    org = Organization.get(id=1)
+
+    NAME_ORGA = org.name_orga
+    CONTACT_ORGA = u"Bamako-Rep. du Mali"
+    TEL_ORGA = org.phone
+    ADRESS_ORGA = org.adress_org
+    BP = org.bp
+    EMAIL_ORGA = org.email_org

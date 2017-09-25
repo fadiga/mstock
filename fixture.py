@@ -10,14 +10,16 @@ import os
 import sys
 sys.path.append(os.path.abspath('../'))
 
-from models import Store
+from models import Store, Organization
 from Common.fixture import AdminFixture
 
 
-class fixt_init(AdminFixture):
-    """docstring for fixt_init"""
+class FixtInit(AdminFixture):
+    """docstring for FixtInit"""
 
     def __init__(self):
-        super(fixt_init, self).__init__()
+        super(FixtInit, self).__init__()
 
         self.LIST_CREAT.append(Store(name=u"Magasin N°1", qte_maxi_stok=5000))
+        self.LIST_CREAT.append(Organization(
+            name=u"Example et frère", phone=00000000))

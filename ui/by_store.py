@@ -77,7 +77,8 @@ class By_storeTableWidget(FTableWidget):
         on = datetime(on.year, on.month, on.day, 0, 0, 0)
         end = datetime(end.year, end.month, end.day, 23, 59, 59)
         reports = []
-        period_report = Reports.select().filter(store=self.store, .date__gte=on, .date__lte=end)
+        period_report = Reports.select().filter(
+            store=self.store, .date__gte=on, .date__lte=end)
         for rept in period_report.group_by("product").order_by(('.date', 'desc')):
             dict = {}
             prod_rept = rept.product
@@ -101,16 +102,16 @@ class By_storeTableWidget(FTableWidget):
             except:
                 raise
                 # pass
-        self.data = [(rep.get('product'), rep.get('sum_qty_in'), rep.get('sum_qty_out'),
-                      rep.get('remaining'))
-                     for rep in reports]
+        self.data = [
+            (rep.get('product'), rep.get('sum_qty_in'), rep.get('sum_qty_out'),
+             rep.get('remaining')) for rep in reports]
 
     def click_item(self, row, column, *args):
         product_column = 0
         if column == product_column:
             from by_product import By_productViewWidget
-            self.parent.change_main_context(By_productViewWidget,
-                                            product=self.data[row][product_column])
+            self.parent.change_main_context(
+                By_productViewWidget, product=self.data[row][product_column])
         else:
             return
 

@@ -25,7 +25,7 @@ class StockOutputWidget(FWidget):
     def __init__(self, store="", parent=0, *args, **kwargs):
         super(StockOutputWidget, self).__init__(parent=parent, *args, **kwargs)
         self.parentWidget().setWindowTitle(
-            "{} {}".format(Config.NAME_ORG, "SORTIE STOCK "))
+            "{} {}".format(Config.APP_NAME, "SORTIE STOCK "))
         self.parent = parent
         self.store = store
         vbox = QVBoxLayout(self)
