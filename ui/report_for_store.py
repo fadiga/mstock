@@ -33,6 +33,10 @@ class ReportForStoreWidget(FWidget):
         self.btt_output = QPushButton(QIcon.fromTheme(
             '', QIcon(u"{}out.png".format(Config.img_media))), u"Sortie")
         self.btt_output.clicked.connect(self.goto_output)
+        self.btt_transfer = QPushButton(
+            QIcon.fromTheme('', QIcon(u"{}transfer.png".format(
+                Config.img_media))), u"Transfert")
+        self.btt_transfer.clicked.connect(self.goto_transfer)
 
         self.btt_export_pdf = BttExportPDF("")
         self.btt_export_pdf.clicked.connect(self.export_pdf)
@@ -41,6 +45,7 @@ class ReportForStoreWidget(FWidget):
         gridbox = QGridLayout()
         gridbox.addWidget(self.btt_input, 0, 1)
         gridbox.addWidget(self.btt_output, 0, 2)
+        gridbox.addWidget(self.btt_transfer, 0, 3)
         gridbox.setColumnStretch(7, 2)
         gridbox.addWidget(self.btt_export_pdf, 0, 8)
         gridbox.addWidget(self.btt_export_xlsx, 0, 9)
@@ -59,8 +64,12 @@ class ReportForStoreWidget(FWidget):
         from ui.stock_output import StockOutputWidget
         self.change_main_context(StockOutputWidget, store=self.store)
 
-    def export_pdf(self):
+    def goto_transfer(self):
+        from ui.stock_transfer import StockTransferWidget
+        self.parent.open_dialog(
+            StockTransferWidget, modal=True, store=self.store, table_p=self.table_resultat)
 
+    def export_pdf(self):
         from Common.exports_pdf import export_dynamic_data
         export_dynamic_data(self.table_resultat.dict_data())
 

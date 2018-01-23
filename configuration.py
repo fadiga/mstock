@@ -41,9 +41,8 @@ class Config(CConstants):
     NAME_MAIN = "main.py"
 
     pdf_source = "pdf_source.pdf"
-    APP_NAME = "M. Stock"
-
-    APP_VERSION = u"6.3"
+    APP_NAME = "MStock"
+    APP_VERSION = 1
 
     APP_DATE = u"03/2017"
     img_media = os.path.join(os.path.join(ROOT_DIR, "static"), "images/")

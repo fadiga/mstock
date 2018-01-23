@@ -14,7 +14,6 @@ from Common.ui.common import FMainWindow, QToolBadgeButton
 
 from ui.menutoolbar import MenuToolBar
 from ui.menubar import MenuBar
-from Common.ui.statusbar import GStatusBar
 from ui.dashboard import DashbordViewWidget
 
 from configuration import Config
@@ -32,8 +31,6 @@ class MainWindow(FMainWindow):
         self.toolbar = MenuToolBar(self)
         self.addToolBar(Qt.LeftToolBarArea, self.toolbar)
 
-        self.statusbar = GStatusBar(self)
-        self.setStatusBar(self.statusbar)
         self.page = DashbordViewWidget
 
         self.change_context(self.page)

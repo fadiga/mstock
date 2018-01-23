@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath('../'))
 
 from ui.mainwindow import MainWindow
 from Common.ui.window import FWindow
-from Common.ui.qss import appStyle
+from Common.ui.qss import theme
 from Common.cmain import cmain
 
 
@@ -26,10 +26,10 @@ app = QApplication(sys.argv)
 def main():
     """  """
     window = MainWindow()
-    window.setStyleSheet(appStyle)
+    window.setStyleSheet(theme)
     setattr(FWindow, 'window', window)
-    window.show()
-    # window.showMaximized()
+    # window.show()
+    window.showMaximized()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

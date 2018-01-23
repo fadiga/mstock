@@ -66,7 +66,7 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
             self.box_prod.setCurrentIndex(i)
 
         self.box_type.setEnabled(False)
-        self.date_.setEnabled(False)
+        # self.date_.setEnabled(False)
         self.box_store.setEditable(True)
         self.box_prod.setEditable(True)
         editbox.addWidget(QtGui.QLabel(u"Type"), 0, 0)
@@ -100,7 +100,7 @@ class EditReportViewWidget(QtGui.QDialog, FWidget):
         report.product = self.liste_product[self.box_prod.currentIndex()]
         report.qty_use = str(self.qty_use.text())
         # report.remaining = 0
-        # report.date = date_to_datetime(self.date_.text())
+        report.date = date_to_datetime(self.date_.text())
         report.save()
         self.cancel()
         self.table_p.refresh_()
