@@ -108,10 +108,10 @@ class ReportTableWidget(FTableWidget):
             for store in Store.select().order_by(Store.name):
                 try:
                     repts = Reports.select().where(
-                        Reports.store == store, Reports.product == prod
-                    ).order_by(-Reports.date)[0]
+                        Reports.store == store, Reports.product == prod).order_by(-Reports.date)[0]
                     remaining = repts.remaining
                     last_op = repts.date
+                    print(remaining)
                 except Exception as e:
                     print(e)
                     continue

@@ -35,6 +35,7 @@ class Setup(AdminDatabase):
     def __init__(self):
         super(AdminDatabase, self).__init__()
 
-        self.LIST_CREAT += [Category, Store,
-                            Product, Reports, Invoice, InvoiceItem]
+        self.LIST_CREAT += [
+            Category, Store, Product, Reports, Invoice, InvoiceItem]
         # self.LIST_CREAT.append(ProviderOrClient)
+        self.CREATE_DB = False

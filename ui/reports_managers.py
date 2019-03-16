@@ -148,8 +148,8 @@ class GReportTableWidget(FTableWidget):
                       rap.qty_use, rap.remaining,
                       show_date(rap.date), rap.id)
                      for rap in reports.order_by(
-            Reports.date.desc(), Reports.store.desc(),
-            Reports.product.desc())]
+            Reports.date.desc(), Reports.store.desc(), Reports.product.desc()
+        )]
         self.refresh()
 
     def _item_for_data(self, row, column, data, context=None):

@@ -305,15 +305,15 @@ class InproductTableWidget(FTableWidget):
                         self.item(row_num, self.col_dest).text())).order_by(
                     Reports.date.desc()).get()
                 qtremaining = last_report.remaining
-                date_out = str(self.parent.date_out.text())
-                if last_report.date > date_on_or_end(date_out, on=False):
-                    self.parent.date_out.setStyleSheet("font-size:15px;"
-                                                       "color:red")
-                    self.parent.date_out.setToolTip(
-                        "Cette date est Inférieure à la date de la dernière rapport ({}).".format(last_report.date))
-                    self.isvalid = False
-                    self.button.setEnabled(False)
-                    # return False
+                # date_out = str(self.parent.date_out.text())
+                # if last_report.date > date_on_or_end(date_out, on=False):
+                #     self.parent.date_out.setStyleSheet("font-size:15px;"
+                #                                        "color:red")
+                #     self.parent.date_out.setToolTip(
+                #         "Cette date est Inférieure à la date de la dernière rapport ({}).".format(last_report.date))
+                #     self.isvalid = False
+                #     self.button.setEnabled(False)
+                # return False
 
             except Exception as e:
                 qtremaining = 0

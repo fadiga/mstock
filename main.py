@@ -11,7 +11,6 @@ import sys
 
 from PyQt4.QtGui import QApplication
 
-
 sys.path.append(os.path.abspath('../'))
 
 from ui.mainwindow import MainWindow

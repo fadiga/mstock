@@ -7,8 +7,8 @@ import xlwt
 from datetime import date
 
 from Common.ui.util import openFile
-from configuration import Config
-from models import Reports, InvoiceItem, Product
+from Common.models import Organization
+from models import Reports, InvoiceItem
 
 font_title = xlwt.Font()
 font_title.name = 'Times New Roman'
@@ -93,9 +93,10 @@ def write_report_xls(file_name, data):
     # de colonne à merger, u"contenu", style(optionnel)).
     book = xlwt.Workbook(encoding='ascii')
     sheet = book.add_sheet(u"Rapports")
+    organization_name = Organization.get(id=1).name_orga
     rowx = 0
-    sheet.write_merge(rowx, rowx + 1, 0, 3,
-                      u"Rapports de gestion de stock %s" % Config.NAME_ORGA, style_title)
+    sheet.write_merge(
+        rowx, rowx + 1, 0, 3, u"Rapports de gestion de stock %s" % organization_name, style_title)
     rowx += 3
     sheet.write_merge(rowx, rowx, 1, 2, u"Date du rapport: ", style)
     date_com = "Bko le %s" % date.today().strftime(u"%d/%m/%Y")
@@ -112,8 +113,8 @@ def write_report_xls(file_name, data):
         else:
             style_row_table = style2
         sheet.write(rowx, 0, rap.type_, style_row_table)
-        sheet.write(rowx, 1, "%s (%s)" % (rap.product.name,
-                                          rap.product.code_prod), style_row_table)
+        sheet.write(rowx, 1, "%s (%s)" % (
+            rap.product.name, rap.product.code_prod), style_row_table)
         sheet.write(rowx, 2, rap.nbr_carton, style_row_table)
         sheet.write(rowx, 3, rap.remaining, style_row_table)
         sheet.write(
@@ -125,21 +126,22 @@ def write_report_xls(file_name, data):
 
 
 def write_order_xls(file_name, order):
+    organization_name = Organization.get(id=1).name_orga
     com_date, order = order
     book = xlwt.Workbook(encoding='ascii')
-    sheet = book.add_sheet(u"%s COMMANDE" % Config.NAME_ORGA)
+    sheet = book.add_sheet(u"%s COMMANDE" % organization_name)
     sheet.col(0).width = 0x0d00 * 2
     sheet.col(1).width = 0x0d00 * 4
     sheet.col(2).width = 0x0d00 * 2
     rowx = 0
     sheet.write_merge(rowx, rowx + 1, 0, 2,
-                      u"%s COMMANDE" % Config.NAME_ORGA, style_title)
+                      u"%s COMMANDE" % organization_name, style_title)
     rowx += 2
     sheet.write_merge(rowx, rowx, 0, 2, u"DRAMANE KOUREKAMA ET FILS", style_)
     rowx += 1
-    sheet.write_merge(rowx, rowx, 0, 2,
-                      u"B.P.: 177–Tél. Bout. N°: 20229776/76429471/76422142",
-                      style_)
+    sheet.write_merge(
+        rowx, rowx, 0, 2,
+        u"B.P.: 177–Tél. Bout. N°: 20229776/76429471/76422142", style_)
     rowx += 1
     sheet.write_merge(rowx, rowx, 0, 2,
                       u"E-mail: ultimomalidk@yahoo.fr–Bamako-Rép. Du Mali",
@@ -168,20 +170,21 @@ def write_order_xls(file_name, order):
 
 def write_invoice_xls(file_name, invoice):
 
+    organization_name = Organization.get(id=1).name_orga
     book = xlwt.Workbook(encoding='ascii')
-    sheet = book.add_sheet(u"Facture %s" % Config.NAME_ORGA)
+    sheet = book.add_sheet(u"Facture %s" % organization_name)
     sheet.col(1).width = 0x0d00 * 3
     sheet.col(4).width = 0x0d00 * 2
     rowx = 0
     sheet.write_merge(rowx, rowx + 1, 0, 3,
-                      u"Facture de %s" % Config.NAME_ORGA, style_title)
+                      u"Facture de %s" % organization_name, style_title)
 
     rowx += 3
     date = "Bko le %s" % invoice.date.strftime("%d/%m/%Y")
     sheet.write_merge(rowx, rowx, 2, 3, date)
 
-    hheaders = [_(u"Quantité"), _(u"Désignation"), _(u"Prix Unitaire"),
-                _(u"Montant")]
+    hheaders = [
+        _(u"Quantité"), _(u"Désignation"), _(u"Prix Unitaire"), _(u"Montant")]
     rowx += 2
     for colx, val_center in enumerate(hheaders):
         sheet.write(rowx, colx, val_center, style_t_table)

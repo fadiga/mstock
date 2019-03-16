@@ -113,7 +113,7 @@ class ReportTableWidget(FTableWidget):
 
         reports = []
 
-        for prod in Product.select().order_by(Product.name):
+        for prod in [p for p in Product.select().order_by(Product.name) if p.last_remaining > 0]:
             try:
                 repts = Reports.select().where(
                     Reports.store == self.store, Reports.product == prod

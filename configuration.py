@@ -7,7 +7,8 @@ from __future__ import (unicode_literals, absolute_import, division,
 import os
 # from static import Constants
 from Common.cstatic import CConstants
-from Common.models import Organization
+# from Common.models import Organization
+from models import Reports
 
 ROOT_DIR = os.path.dirname(os.path.abspath('__file__'))
 
@@ -58,11 +59,13 @@ class Config(CConstants):
     BP = u"B.P:177"
     EMAIL_ORGA = u"ultimomalidk@yahoo.fr"
 
-    org = Organization.get(id=1)
+    # org = Organization.get(id=1)
 
-    NAME_ORGA = org.name_orga
-    CONTACT_ORGA = u"Bamako-Rep. du Mali"
-    TEL_ORGA = org.phone
-    ADRESS_ORGA = org.adress_org
-    BP = org.bp
-    EMAIL_ORGA = org.email_org
+    # NAME_ORGA = org.name_orga
+    # CONTACT_ORGA = u"Bamako-Rep. du Mali"
+    # TEL_ORGA = org.phone
+    # ADRESS_ORGA = org.adress_org
+    # BP = org.bp
+    # EMAIL_ORGA = org.email_org
+
+    list_models = [Reports]

@@ -100,6 +100,15 @@ class Product(BaseModel):
             last = None
         return last
 
+    @property
+    def last_remaining(self):
+        try:
+            last = self.report.order_by(Reports.date.desc()).get()
+            last = last.remaining
+        except Exception as e:
+            last = 0
+        return last
+
     def reports(self):
         try:
             return self.report.order_by(Reports.date.desc())
@@ -144,31 +153,32 @@ class Reports(BaseModel):
         """
         Calcul du remaining en stock après une operation."""
         from Common.ui.util import raise_error
-        print("SAVE BEGIN")
+        # print("SAVE BEGIN")
 
         prev_remaining = self.get_prev_remaining()
         # print("prev_remaining : ", prev_remaining, " EE ",
         #       self.product.name, "M : ", self.store.name)
-        print(prev_remaining, "TTTTTTTTTTTTT")
+        # print(prev_remaining, "TTTTTTTTTTTTT")
         if self.type_ == self.E:
             self.remaining = int(prev_remaining) + int(self.qty_use)
         elif self.type_ == self.S:
             self.remaining = int(prev_remaining) - int(self.qty_use)
+
+            # try:
+            #     assert(self.remaining > 0)
+            # except Exception as e:
+            #     print(e)
+            #     raise_error(
+            #         "Erreur",
+            #         "Produit : {} >> Magasin {} \n On peut pas utilisé {} puis"
+            #         "qu'il ne reste que {}".format(
+            #             self.product.name, self.store.name,
+            #             self.qty_use, prev_remaining))
+            #     return False
         else:
             raise_error(u"Erreur",
                         u"Type d'opération inconnus")
             return
-
-        try:
-            assert(self.remaining > 0)
-        except:
-            raise_error(
-                "Erreur",
-                "Produit : {} >> Magasin {} \n On peut pas utilisé {} puis"
-                "qu'il ne reste que {}".format(
-                    self.product.name, self.store.name,
-                    self.qty_use, prev_remaining))
-            return False
 
         super(Reports, self).save()
 
@@ -178,7 +188,7 @@ class Reports(BaseModel):
     # 793O5759
 
     def get_prev_remaining(self):
-        print("self.prev_rpt()", self.prev_rpt())
+        # print("self.prev_rpt()", self.prev_rpt())
         return 0 if not self.prev_rpt() else self.prev_rpt().remaining
 
     @property
@@ -258,7 +268,8 @@ class Invoice(BaseModel):
     )
     owner = peewee.ForeignKeyField(Owner, verbose_name=("Proprietaire"))
     number = peewee.IntegerField(verbose_name=("Numero"), unique=True)
-    date = peewee.DateTimeField(verbose_name=("Fait le"), default=datetime.now)
+    date = peewee.DateTimeField(verbose_name=(
+        "Fait le"), default=datetime.now())
     client = peewee.CharField(max_length=30, verbose_name=("Doit"))
     location = peewee.CharField(max_length=50, null=True, verbose_name=("A"))
     type_ = peewee.CharField(max_length=30, choices=TYPES, default=TYPE_PROF)
