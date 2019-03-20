@@ -113,13 +113,14 @@ class ReportTableWidget(FTableWidget):
 
         reports = []
 
-        for prod in [p for p in Product.select().order_by(Product.name) if p.last_remaining > 0]:
+        for prod in [p for p in Product.select().order_by(Product.name)]:
             try:
                 repts = Reports.select().where(
                     Reports.store == self.store, Reports.product == prod
                 ).order_by(-Reports.date)[0]
                 remaining = repts.remaining
                 last_op = repts.date
+                print(repts.product, remaining)
             except Exception as e:
                 continue
             dict_store = {}
@@ -127,7 +128,8 @@ class ReportTableWidget(FTableWidget):
             dict_store["last_remaining_box"] = remaining
             dict_store["last_remaining_p"] = remaining * prod.number_parts_box
             dict_store["last_op"] = last_op
-            reports.append(dict_store)
+            if remaining > 0:
+                reports.append(dict_store)
 
         self.data = [(rep.get('prod'), rep.get('last_remaining_box'),
                       rep.get('last_remaining_p'), show_date(
