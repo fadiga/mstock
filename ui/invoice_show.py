@@ -14,7 +14,7 @@ from tools.export_pdf import pdFview
 from tools.export_xls import write_invoice_xls
 from Common.ui.util import formatted_number, is_int, uopen_file
 from Common.ui.common import (
-    FWidget, FPageTitle, FLabel, Deleted_btt, BttExportXLSX, BttExportPDF)
+    FWidget, FPageTitle, FLabel, DeletedBtt, BttExportXLSX, BttExportPDF)
 from Common.ui.table import FTableWidget
 
 
@@ -138,7 +138,7 @@ class ShowInvoiceTableWidget(FTableWidget):
         bicon = QIcon.fromTheme(
             '', QIcon(u"{}del.png".format(Config.img_media)))
         # self.button = QPushButton(bicon, u"Annuler la facture")
-        self.button = Deleted_btt(u"Annuler la facture")
+        self.button = DeletedBtt(u"Annuler la facture")
         self.button.released.connect(self.parent.annulation)
         # self.setCellWidget(nb_rows + 2, 3, self.button)
 

@@ -4,31 +4,33 @@
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
-                         QMenu, QComboBox, QPushButton)
+                         QMenu, QComboBox, QPushButton, QDialog)
 from PyQt4.QtCore import QDate, Qt
 
 from configuration import Config
 from models import (Store, Product, Reports)
 
-from Common.ui.common import (FWidget, IntLineEdit, FormLabel, FormatDate,
-                              Button)
+from Common.ui.common import(FWidget, IntLineEdit, FormLabel, FormatDate, Button)
 from Common.ui.util import is_int, date_to_datetime, formatted_number
 from Common.ui.table import FTableWidget
 
-from ui.reports_managers import GReportViewWidget
 from GCommon.ui._product_detail import InfoTableWidget
 
 
-class StockInputWidget(FWidget):
+class StockInputWidget(QDialog, FWidget):
 
-    def __init__(self, store="", parent=0, *args, **kwargs):
-        super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
+    def __init__(self, store="", table="", parent=0, *args, **kwargs):
+        # super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
+        QDialog.__init__(self, parent, *args, **kwargs)
+
         title = u"   ENTREE STOCK"
-        self.parentWidget().setWindowTitle(
-            "{} {}".format(Config.APP_NAME, title))
-        Config.logging.info(title)
+        self.setWindowTitle("{} {}".format(Config.APP_NAME, title))
+        # Config.logging.info(title)
+        self.setFixedWidth(self.parentWidget().width() - 50)
+        self.setFixedHeight(self.parentWidget().height())
         self.parent = parent
         self.store = store
+        self.table_p = table
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         editbox = QGridLayout()
@@ -134,7 +136,8 @@ class StockInputWidget(FWidget):
                     "Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
                 return False
 
-        self.parent.change_context(GReportViewWidget)
+        self.table_p.refresh_()
+        self.close()
         self.parent.Notify(u"L'entrée des articles avec succès", "success")
 
 

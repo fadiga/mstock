@@ -48,7 +48,7 @@ class MenuBar(FMenuBar, FWidget):
                     "shortcut": "Ctrl+S", "goto": StockOutputWidget},
                 {"name": u"State", "icon": 'state', "admin": False,
                     "shortcut": "Ctrl+R", "goto": StateStockViewWidget},
-                {"name": u"Magasin", "icon": 'store', "admin": False,
+                {"name": u"Magasin", "icon": 'warehouse', "admin": False,
                     "shortcut": "Ctrl+M", "goto": StoresViewWidget},
                 {"name": u"Facturation", "icon": 'invoice', "admin": False,
                     "shortcut": "Ctrl+F", "goto": InvoiceViewWidget},

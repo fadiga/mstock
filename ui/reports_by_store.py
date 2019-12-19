@@ -5,7 +5,7 @@
 from datetime import date, datetime
 from PyQt4.QtCore import Qt, QDate
 from PyQt4.QtGui import (
-    QVBoxLayout, QGridLayout, QTableWidgetItem, QIcon, QMenu)
+    QVBoxLayout, QGridLayout, QTableWidgetItem, QIcon, QMenu, QDialog)
 
 from configuration import Config
 from models import Reports, Store
@@ -16,10 +16,22 @@ from Common.ui.util import (
     raise_error, date_on_or_end, show_date)
 
 
-class GReportViewWidget(FWidget):
+class ReportsViewWidget(QDialog, FWidget):
 
-    def __init__(self, store=None, parent=0, *args, **kwargs):
-        super(GReportViewWidget, self).__init__(parent=parent, *args, **kwargs)
+    # def __init__(self, store=None, parent=0, *args, **kwargs):
+    #     super(ReportsViewWidget, self).__init__(parent=parent,
+    #                                             *args, **kwargs)
+
+    def __init__(self, store="", parent=0, *args, **kwargs):
+        # super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
+        QDialog.__init__(self, parent, *args, **kwargs)
+
+        title = u"GESTION DES RAPPORTS"
+        self.setWindowTitle("{} {}".format(Config.APP_NAME, title))
+        # Config.logging.info(title)
+        self.setFixedWidth(self.parentWidget().width() - 50)
+        self.setFixedHeight(self.parentWidget().height())
+
         self.parentWidget().setWindowTitle(
             "{} {}".format(Config.APP_NAME, "GESTION DES RAPPORTS"))
         self.parent = parent
@@ -71,7 +83,7 @@ class GReportViewWidget(FWidget):
 
         dict_data = {
             'title': "Mouvements du Magasion : {}".format(self.store),
-            'file_name': "Mouvements-{}".format(self.store),
+            'file_name': "Mouvements-{}".format(self.store.name),
             'headers': self.table_op.hheaders[:-1],
             'data': self.table_op.data,
             "date": "Du {} au {}".format(
@@ -85,7 +97,7 @@ class GReportViewWidget(FWidget):
         from Common.exports_xlsx import export_dynamic_data
 
         dict_data = {
-            'file_name': "Mouvements-{}".format(self.store),
+            'file_name': "Mouvements-{}".format(self.store.name),
             'headers': self.table_op.hheaders[:-1],
             'data': self.table_op.data,
             'sheet': self.title,
@@ -111,7 +123,7 @@ class GReportTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [u" ", u"Magasin", u"Produit", u"Quantité utilisé",
+        self.hheaders = [u" ", u"Produit", u"Quantité utilisé",
                          u"Restante", u"Date", u""]
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
@@ -131,19 +143,18 @@ class GReportTableWidget(FTableWidget):
         self.set_data_for()
         self.refresh()
         # je cache la 7 eme colonne
-        self.hideColumn(6)
+        self.hideColumn(5)
         self.setColumnWidth(0, 40)
 
     def set_data_for(self):
 
         on = date_on_or_end(self.parent.on_date.text()),
         end = date_on_or_end(self.parent.end_date.text(), on=False)
-        reports = Reports.filter(
-            deleted=False, date__gte=on, date__lte=end)
+        reports = Reports.filter(deleted=False, date__gte=on, date__lte=end)
         if self.parent.store:
             reports = reports.filter(store=self.parent.store)
 
-        self.data = [(rap.type_, rap.store.name, rap.product.name,
+        self.data = [(rap.type_, rap.product.name,
                       rap.qty_use, rap.remaining,
                       show_date(rap.date), rap.id)
                      for rap in reports.order_by(
@@ -169,7 +180,7 @@ class GReportTableWidget(FTableWidget):
 
         # self.report = Reports.filter(id=self.data[row][6]).get()
         self.report = Reports.select().where(
-            Reports.id == self.data[row][6]).get()
+            Reports.id == self.data[row][5]).get()
         menu = QMenu()
         delaction = menu.addAction(
             QIcon("{}del.png".format(Config.img_cmedia)), "supprimer")

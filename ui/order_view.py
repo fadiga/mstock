@@ -10,7 +10,7 @@ from PyQt4.QtCore import Qt, QDate, SIGNAL
 from configuration import Config
 from Common.ui.util import raise_error, date_to_datetime
 from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLSX,
-                              IntLineEdit, Button_save, FormatDate, Deleted_btt,
+                              IntLineEdit, ButtonSave, FormatDate, DeletedBtt,
                               QLineEdit)
 from Common.ui.table import FTableWidget
 
@@ -40,7 +40,7 @@ class OrderViewWidget(FWidget):
 
         self.com_date = FormatDate(QDate.currentDate())
 
-        self.restor_order_btt = Deleted_btt(u"vider")
+        self.restor_order_btt = DeletedBtt(u"vider")
         self.connect(self.restor_order_btt, SIGNAL('clicked()'),
                      self.remove_save)
 

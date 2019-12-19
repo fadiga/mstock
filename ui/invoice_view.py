@@ -11,7 +11,7 @@ from PyQt4.QtCore import QDate, Qt
 from configuration import Config
 from models import (Store, Product, Invoice, InvoiceItem, Owner, Reports)
 from Common.ui.common import (FWidget, IntLineEdit, FBoxTitle, ErrorLabel,
-                              FormLabel, FormatDate, Button_menu, Button_save)
+                              FormLabel, FormatDate, Button_menu, ButtonSave)
 from Common.ui.util import raise_error, formatted_number, is_int, date_to_datetime
 from Common.ui.table import FTableWidget
 
@@ -390,7 +390,7 @@ class OrderTableWidget(FTableWidget):
         nb_rows += 1
         self.setRowCount(nb_rows + 1)
         self.setSpan(nb_rows, 0, 1, 3)
-        self.button = Button_save(u"Enregistrer")
+        self.button = ButtonSave(u"Enregistrer")
         self.button.released.connect(self.parent.save_b)
         self.setCellWidget(nb_rows, 3, self.button)
 

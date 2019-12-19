@@ -4,30 +4,34 @@
 
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
-                         QPushButton, QMenu, QComboBox)
+                         QPushButton, QMenu, QComboBox, QDialog)
 from PyQt4.QtCore import QDate, Qt, SIGNAL
-
 
 from configuration import Config
 from Common.ui.common import (FWidget, IntLineEdit,
                               FormLabel, FormatDate)
-from Common.ui.util import is_int, date_to_datetime, date_on_or_end
+from Common.ui.util import is_int, date_to_datetime
 from Common.ui.table import FTableWidget
 from peewee import fn
 
-from ui.reports_managers import GReportViewWidget
+# from ui.reports_managers import GReportViewWidget
 from GCommon.ui._product_detail import InfoTableWidget
 from models import (Store, Product, Reports)
 
 
-class StockOutputWidget(FWidget):
+class StockOutputWidget(QDialog, FWidget):
 
-    def __init__(self, store="", parent=0, *args, **kwargs):
-        super(StockOutputWidget, self).__init__(parent=parent, *args, **kwargs)
-        self.parentWidget().setWindowTitle(
-            "{} {}".format(Config.APP_NAME, "SORTIE STOCK "))
+    def __init__(self, store="", table="", parent=0, *args, **kwargs):
+        # super(StockInputWidget, self).__init__(parent=parent, *args, **kwargs)
+        QDialog.__init__(self, parent, *args, **kwargs)
+
+        title = u"SORTIE"
+        self.setWindowTitle("{} {}".format(Config.APP_NAME, title))
+        self.setFixedWidth(self.parentWidget().width() - 50)
+        self.setFixedHeight(self.parentWidget().height())
         self.parent = parent
         self.store = store
+        self.table_p = table
         vbox = QVBoxLayout(self)
         hbox = QHBoxLayout(self)
         editbox = QGridLayout()
@@ -69,7 +73,7 @@ class StockOutputWidget(FWidget):
 
         editbox.addWidget(FormLabel(u"Magasin:"), 0, 4)
         editbox.addWidget(self.box_store, 0, 5)
-        editbox.addWidget(FormLabel(u"Date d'achat:"), 0, 6)
+        editbox.addWidget(FormLabel(u"Date de sortie:"), 0, 6)
         editbox.addWidget(self.date_out, 0, 7)
 
         editbox.setColumnStretch(3, 3)
@@ -124,8 +128,9 @@ class StockOutputWidget(FWidget):
                     u"Ce mouvement n'a pas pu être enrgistré dans les raports",
                     "error")
                 return False
-
-        self.parent.change_context(GReportViewWidget)
+        self.table_p.refresh_()
+        self.close()
+        # self.parent.change_context(GReportViewWidget)
         self.parent.Notify(u"La sortie des articles avec succès", "success")
 
 

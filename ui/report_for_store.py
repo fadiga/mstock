@@ -3,14 +3,19 @@
 # maintainer: Fad
 
 
-from PyQt4.QtGui import QVBoxLayout, QGridLayout, QIcon, QPushButton
+from PyQt4.QtCore import Qt, QDate
+from PyQt4.QtGui import (
+    QVBoxLayout, QGridLayout, QIcon, QPushButton, QTableWidgetItem, QMenu)
 
-from datetime import datetime
+from datetime import datetime, date
 from configuration import Config
-from models import (Store, Product, Reports)
+from models import Product, Reports, Store
 
-from Common.ui.common import (FWidget, FLabel, BttExportPDF, BttExportXLSX)
-from Common.ui.util import show_date
+from Common.ui.common import (
+    FormatDate, FWidget, FLabel, BttExportPDF, BttExportXLSX)
+
+from Common.ui.util import (
+    raise_error, date_on_or_end, show_date)
 from Common.ui.table import FTableWidget
 
 
@@ -20,13 +25,19 @@ class ReportForStoreWidget(FWidget):
         super(ReportForStoreWidget, self).__init__(
             parent=parent, *args, **kwargs)
         self.title = u"<h1> Situation du : <i>{}</i></h1>".format(store)
-        self.parentWidget().set_window_title("Magasin {}".format(store))
+        self.parentWidget().set_window_title("Magasin {}".format(store.name))
         self.parent = parent
-        self.store = Store.get(name=store)
-
+        # self.store = Store.get(name=store)
+        self.store = store
+        self.movement = False
         self.table_resultat = ReportTableWidget(parent=self)
+        self.on_date = FormatDate(QDate(date.today().year, 1, 1))
+        self.end_date = FormatDate(QDate.currentDate())
 
         self.prod_label = FLabel(self.title)
+        self.btt_back = QPushButton(QIcon.fromTheme(
+            '', QIcon(u"{}back_64.png".format(Config.img_media))), "")
+        self.btt_back.clicked.connect(self.goto_back)
         self.btt_input = QPushButton(QIcon.fromTheme(
             '', QIcon(u"{}in.png".format(Config.img_media))), u"Entrée")
         self.btt_input.clicked.connect(self.goto_input)
@@ -37,15 +48,20 @@ class ReportForStoreWidget(FWidget):
             QIcon.fromTheme('', QIcon(u"{}transfer.png".format(
                 Config.img_media))), u"Transfert")
         self.btt_transfer.clicked.connect(self.goto_transfer)
-
+        self.btt_status = QPushButton(
+            QIcon.fromTheme('', QIcon(u"{}reports.png".format(
+                Config.img_media))), u"Movement")
+        self.btt_status.clicked.connect(self.goto_status)
         self.btt_export_pdf = BttExportPDF("")
         self.btt_export_pdf.clicked.connect(self.export_pdf)
         self.btt_export_xlsx = BttExportXLSX("")
         self.btt_export_xlsx.clicked.connect(self.export_xlsx)
         gridbox = QGridLayout()
+        gridbox.addWidget(self.btt_back, 0, 0)
         gridbox.addWidget(self.btt_input, 0, 1)
         gridbox.addWidget(self.btt_output, 0, 2)
         gridbox.addWidget(self.btt_transfer, 0, 3)
+        gridbox.addWidget(self.btt_status, 0, 4)
         gridbox.setColumnStretch(7, 2)
         gridbox.addWidget(self.btt_export_pdf, 0, 8)
         gridbox.addWidget(self.btt_export_xlsx, 0, 9)
@@ -56,25 +72,34 @@ class ReportForStoreWidget(FWidget):
         vbox.addWidget(self.table_resultat)
         self.setLayout(vbox)
 
+    def goto_back(self):
+        from GCommon.ui.stores import StoresViewWidget
+        self.change_main_context(StoresViewWidget, store=self.store)
+
     def goto_input(self):
         from ui.stock_input import StockInputWidget
-        self.change_main_context(StockInputWidget, store=self.store)
+        self.parent.open_dialog(StockInputWidget, modal=True, store=self.store, table=self.table_resultat)
 
     def goto_output(self):
         from ui.stock_output import StockOutputWidget
-        self.change_main_context(StockOutputWidget, store=self.store)
+        self.parent.open_dialog(StockOutputWidget, modal=True, store=self.store, table=self.table_resultat)
 
     def goto_transfer(self):
         from ui.stock_transfer import StockTransferWidget
         self.parent.open_dialog(
             StockTransferWidget, modal=True, store=self.store, table_p=self.table_resultat)
 
+    def goto_status(self):
+        from ui.reports_by_store import ReportsViewWidget
+
+        self.parent.open_dialog(
+            ReportsViewWidget, modal=True, store=self.store)
+
     def export_pdf(self):
         from Common.exports_pdf import export_dynamic_data
         export_dynamic_data(self.table_resultat.dict_data())
 
     def export_xlsx(self):
-
         from Common.exports_xlsx import export_dynamic_data
         export_dynamic_data(self.table_resultat.dict_data())
 

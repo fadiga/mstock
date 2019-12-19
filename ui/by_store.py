@@ -78,7 +78,7 @@ class By_storeTableWidget(FTableWidget):
         end = datetime(end.year, end.month, end.day, 23, 59, 59)
         reports = []
         period_report = Reports.select().filter(
-            store=self.store, .date__gte=on, .date__lte=end)
+            store=self.store, date__gte=on, date__lte=end)
         for rept in period_report.group_by("product").order_by(('.date', 'desc')):
             dict = {}
             prod_rept = rept.product
