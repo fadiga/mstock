@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
+from datetime import date
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
-                         QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
+                         QMessageBox, QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
                          QMenu, QComboBox, QPushButton, QDialog)
 from PyQt4.QtCore import QDate, Qt
 
@@ -117,18 +118,38 @@ class StockInputWidget(QDialog, FWidget):
         # entete de la facture
         if not self.table_in.isvalid:
             return False
-        date = str(self.date.text())
-        datetime_ = date_to_datetime(date)
+
+        datetime_ = date_to_datetime(str(self.date.text()))
         store = self.liste_store[self.box_mag.currentIndex()]
         values_t = self.table_in.get_table_items()
 
-        for ligne in values_t:
-            qty, name = ligne
+        for qty, name in values_t:
             product = Product.select().where(Product.name == name).get()
 
             rep = Reports(orders=None, type_=Reports.E, store=store,
-                          date=datetime_, product=product,
-                          qty_use=int(qty))
+                          date=datetime_, product=product, qty_use=int(qty))
+            try:
+                rep_p = Reports.select().where(
+                    Reports.product == product, Reports.type_ == Reports.E,
+                    Reports.store == store,
+                    Reports.qty_use == int(qty)).get()
+            except:
+                rep_p = False
+            if rep_p and date.today() == datetime_.date():
+                print("if duplicate_record")
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setWindowTitle("Alerte doublon")
+                msg.setText(
+                    "{qty} {prod} a été rentré aujourd'hui ({date}) à {time_} dans le magasin {mag}".format(
+                        date=datetime_.strftime("%d/%m/%Y"), prod=rep_p.product.name, time_=rep_p.date.strftime("%H: %M"), mag=rep_p.store, qty=rep_p.qty_use))
+                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                if msg.exec_() == QMessageBox.Cancel:
+                    print("Pas accepter")
+                    return False
+                # if msg.exec_() == QMessageBox.YesAll:
+                #     yes_all = True
+
             try:
                 rep.save()
             except:
@@ -136,7 +157,7 @@ class StockInputWidget(QDialog, FWidget):
                     "Ce mouvement n'a pas pu être enrgistré dans les raports", "error")
                 return False
 
-        self.table_p.refresh_()
+        # self.table_p.refresh_()
         self.close()
         self.parent.Notify(u"L'entrée des articles avec succès", "success")
 
@@ -295,6 +316,9 @@ class InputTableWidget(FTableWidget):
         for row_num in range(0, self.data.__len__()):
 
             qtsaisi = is_int(self.cellWidget(row_num, self.col_qtty).text())
+            # col_dest = is_int(self.cellWidget(row_num, self.col_dest).text())
+            # designation = self.item(row_num, self.col_dest).text()
+
             nb_parts_box = Product.filter(name=self.item(
                 row_num, self.col_dest).text()).get(
             ).number_parts_box * qtsaisi
@@ -304,7 +328,20 @@ class InputTableWidget(FTableWidget):
                 viderreur_qtsaisi = "background-color: rgb(255, 235, 235);border: 3px double SeaGreen"
                 self.cellWidget(row_num, 0).setToolTip(
                     u"La quantité est obligatoire")
-                self.isvalid = False
+            #     self.isvalid = False
+            # duplicate_record = ""
+            # prod = str(designation)
+            # # qty_use = ""
+
+            # repts = Reports.select().where(
+            #     Reports.qty_use == qtsaisi, Reports.store == self.parent.store, Reports.product == prod).get()
+            # print(repts)
+            # if not repts:
+            #     duplicate_record = "background-color: rgb(255, 235, 235);border: 3px double SeaGreen"
+            #     self.cellWidget(row_num, 0).setToolTip(u"Alert doublons")
+            #     self.isvalid = False
+
+            # self.cellWidget(row_num, 0).setStyleSheet(duplicate_record)
             self.cellWidget(row_num, 0).setStyleSheet(viderreur_qtsaisi)
             self.cellWidget(row_num, 0).setToolTip("")
             self._update_data(row_num, [qtsaisi, nb_parts_box])

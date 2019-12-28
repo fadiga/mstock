@@ -10,7 +10,7 @@ from PyQt4.QtCore import Qt
 
 from configuration import Config
 from models import Reports
-from tools.export_pdf import pdFview
+from tools.export_pdf2 import pdFview
 from tools.export_xls import write_invoice_xls
 from Common.ui.util import formatted_number, is_int, uopen_file
 from Common.ui.common import (

@@ -9,6 +9,7 @@ from models import InvoiceItem
 # from Common.cel import cel
 from num2words import num2words
 from configuration import Config
+from Common.ui.util import formatted_number
 from Common.ui.util import get_temp_filename
 
 
@@ -51,39 +52,40 @@ def pdFview(filename, invoice):
     # Récupération du nombre de pages
     n_pages = input1.getNumPages()
     # Pour chaque page
+    fact = 1
+    y = 660
+    x = 113
+
     for i in range(n_pages):
         # Récupération de la page du doc initial (input1)
         page = input1.getPage(i)
-
         p = canvas.Canvas(TMP_FILE, pagesize=A4)
         # p.setFont(FONT, DEFAULT_FONT_SIZE)
-
-        p.drawString(130, 683, str(invoice.number))
-        p.drawString(98, 667, (invoice.client))
-
-        p.drawString(460, 683, str(invoice.date.strftime(DATE_FORMAT)))
-
+        p.drawString(x + 20, y, str(invoice.number))
+        p.drawString(x + 350, y, str(invoice.date.strftime(DATE_FORMAT)))
+        p.drawString(x - 15, y - 15, (invoice.client))
         # On ecrit les invoiceitem
-        x, y = 40, 610
+        y = 585
         for i in items_invoice:
-            p.drawString(x, y, str(i.quantity).rjust(11, ' '))
-            p.drawString(x + 75, y, str(i.description))
-            p.drawString(x + 340, y, str(i.price).rjust(10, ' '))
-            p.drawString(x + 430, y, str(i.price * i.quantity).rjust(10, ' '))
+            p.drawRightString(x, y, str(formatted_number(i.quantity)))
+            p.drawString(x + 20, y, str(i.description))
+            p.drawRightString(x + 330, y, str(formatted_number(i.price)))
+            p.drawRightString(x + 420, y, str(formatted_number(i.price * i.quantity)))
             y -= 20
         ht = 0
         for i in items_invoice:
             montant = i.price * i.quantity
             ht += montant
 
-        ht_en_lettre = num2words(ht)
-
-        p.drawString(470, 150, str(ht).rjust(10, ' '))
-        ht_en_lettre1, ht_en_lettre2 = controle_caratere(ht_en_lettre +
-                                                         " FCFA", 46, 40)
-        p.drawString(258, 116, (ht_en_lettre + " FCFA"))
-        # p.drawString(258, 116, (ht_en_lettre1))
-        # p.drawString(53, 100, (ht_en_lettre2))
+        ht_en_lettre = num2words(ht, lang='fr')
+        y = 205
+        p.drawRightString(x + 420, y, str(formatted_number(ht)))
+        ht_en_lettre1, ht_en_lettre2 = controle_caratere(
+            ht_en_lettre + " FCFA", 55, 40)
+        # p.drawRightString(x + 558, y - 30, (ht_en_lettre + " FCFA"))
+        print(ht_en_lettre1)
+        p.drawString(x + 155, y - 30, (ht_en_lettre1.title()))
+        p.drawString(x - 60, y - 45, (ht_en_lettre2))
 
         # legal_infos, legal_infos1 = controle_caratere(Config.BP, 55, 55)
         # p.drawString(90, 14, legal_infos)

@@ -8,10 +8,9 @@ from PyQt4.QtGui import (QVBoxLayout, QGridLayout, QCheckBox)
 from PyQt4.QtCore import Qt, QDate, SIGNAL
 
 from configuration import Config
-from Common.ui.util import raise_error, date_to_datetime
-from Common.ui.common import (FWidget, FPageTitle, FormLabel, BttExportXLSX,
-                              IntLineEdit, ButtonSave, FormatDate, DeletedBtt,
-                              QLineEdit)
+from Common.ui.util import date_to_datetime
+from Common.ui.common import (FWidget, FPageTitle, BttExportXLSX, IntLineEdit,
+                              FormatDate, DeletedBtt, QLineEdit)
 from Common.ui.table import FTableWidget
 
 from models import Product
@@ -46,8 +45,8 @@ class OrderViewWidget(FWidget):
 
         self.search_field = QLineEdit()
         self.search_field.setPlaceholderText("Rechercher un article")
-        self.search_field.setMaximumSize(200,
-                                         self.search_field.maximumSize().height())
+        # self.search_field.setMaximumSize(
+        #     200, self.search_field.maximumSize().height())
         self.search_field.textChanged.connect(self.finder)
 
         # Grid

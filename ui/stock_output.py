@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
+from datetime import date
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
-                         QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
-                         QPushButton, QMenu, QComboBox, QDialog)
+                         QMessageBox, QIcon, QGridLayout, QSplitter, QLineEdit,
+                         QFrame, QPushButton, QMenu, QComboBox, QDialog)
 from PyQt4.QtCore import QDate, Qt, SIGNAL
 
 from configuration import Config
@@ -118,9 +119,33 @@ class StockOutputWidget(QDialog, FWidget):
         values_t = self.table_out.get_table_items()
 
         for qty, name in values_t:
+            product = Product.get(name=name)
             rep = Reports(type_=Reports.S, store=self.current_store,
-                          date=datetime_, product=Product.get(name=name),
+                          date=datetime_, product=product,
                           qty_use=int(qty))
+            try:
+                rep_p = Reports.select().where(
+                    Reports.product == product, Reports.type_ == Reports.S,
+                    Reports.store == self.current_store,
+                    Reports.qty_use == int(qty)).get()
+            except:
+                rep_p = None
+
+            if rep_p and date.today() == datetime_.date():
+                print("if duplicate_record")
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setWindowTitle("Alerte doublon")
+                msg.setText(
+                    "{qty} {prod} a été sorti aujourd'hui à {time_} dans le magasin {mag}".format(
+                        prod=rep_p.product.name, time_=rep_p.date.strftime("%H: %M"), mag=rep_p.store, qty=rep_p.qty_use))
+                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                # print("jjj ", msg.exec_(), QMessageBox.Ok, QMessageBox.YesAll)
+                if msg.exec_() == QMessageBox.Cancel:
+                    print("Pas accepter")
+                    return False
+                # if msg.exec_() == QMessageBox.YesAll:
+                #     yes_all = True
             try:
                 rep.save()
             except:

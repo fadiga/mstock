@@ -6,7 +6,7 @@
 
   !define MUI_PRODUCT "Mstock"
   !define MUI_FILE "main"
-  !define MUI_VERSION "V.19.12.1"
+  !define MUI_VERSION "V.19.12.3 KAKO"
   !define MUI_BRANDINGTEXT "${MUI_PRODUCT} ${MUI_VERSION}"
   !define IMAGES "images"
   !define CIMAGES "cimages"

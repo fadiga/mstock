@@ -231,12 +231,12 @@ class Reports(BaseModel):
             return None
 
     def deletes_data(self):
-        print(self.prev_rpts())
+        # print(self.prev_rpts())
         prev_ = self.prev_rpts()
         next_ = self.next_rpt()
         self.delete_instance()
         if prev_:
-            prev_.save()
+            prev_.get().save()
         else:
             if next_:
                 next_.save()
