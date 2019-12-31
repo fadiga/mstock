@@ -334,7 +334,7 @@ class InfoTableWidget(FWidget):
 
     def chow_image(self):
         """ doit afficher l'image complete dans une autre fenetre"""
-        from GCommon.ui.show_image import ShowImageViewWidget
+        from ui.show_image import ShowImageViewWidget
         try:
             self.parent.open_dialog(
                 ShowImageViewWidget, modal=True, prod=self.prod)

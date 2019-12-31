@@ -11,17 +11,17 @@ from PyQt4.QtCore import Qt, QSize
 from configuration import Config
 from Common.ui.common import FWidget
 
-from GCommon.ui.products import ProductsViewWidget
-from GCommon.ui.stores import StoresViewWidget
+from ui.products import ProductsViewWidget
+from ui.stores import StoresViewWidget
 
 from ui.state_stock import StateStockViewWidget
 from ui.dashboard import DashbordViewWidget
 # from ui.reports_managers import GReportViewWidget
 from ui.invoice_view import InvoiceViewWidget
 from ui.inventory import InventoryViewWidget
-from ui.stock_input import StockInputWidget
+# from ui.stock_input import StockInputWidget
 from ui.order_view import OrderViewWidget
-from ui.stock_output import StockOutputWidget
+# from ui.stock_output import StockOutputWidget
 from ui.reports_managers import GReportViewWidget
 from ui.report_product_store import ReportProductStoreWidget
 

@@ -73,7 +73,7 @@ class GReportViewWidget(FWidget):
             'title': "Mouvements du Magasion : {}".format(self.store),
             'file_name': "Mouvements-{}".format(self.store),
             'headers': self.table_op.hheaders[:-1],
-            'data': self.table_op.data,
+            'data': [(el[0], el[1], el[2], el[3], el[4], el[5]) for el in self.table_op.data],
             "date": "Du {} au {}".format(
                 self.on_date.text(), self.end_date.text()),
             'sheet': self.title,
@@ -87,7 +87,7 @@ class GReportViewWidget(FWidget):
         dict_data = {
             'file_name': "Mouvements-{}".format(self.store),
             'headers': self.table_op.hheaders[:-1],
-            'data': self.table_op.data,
+            'data': [(el[0], el[1], el[2], el[3], el[4], el[5]) for el in self.table_op.data],
             'sheet': self.title,
             'widths': self.table_op.stretch_columns,
             "date": "Du {} au {}".format(
@@ -111,7 +111,7 @@ class GReportTableWidget(FTableWidget):
 
         self.parent = parent
 
-        self.hheaders = [u" ", u"Magasin", u"Produit", u"Quantité utilisé",
+        self.hheaders = [u"Type", u"Magasin", u"Produit", u"Quantité utilisé",
                          u"Restante", u"Date", u""]
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popup)
@@ -143,7 +143,7 @@ class GReportTableWidget(FTableWidget):
         if self.parent.store:
             reports = reports.filter(store=self.parent.store)
 
-        self.data = [(rap.type_, rap.store.name, rap.product.name,
+        self.data = [(rap.get_type(), rap.store.name, rap.product.name,
                       rap.qty_use, rap.remaining,
                       show_date(rap.date), rap.id)
                      for rap in reports.order_by(
@@ -152,10 +152,10 @@ class GReportTableWidget(FTableWidget):
         self.refresh()
 
     def _item_for_data(self, row, column, data, context=None):
-        if column == 0 and self.data[row][0] == Reports.E:
+        if column == 0 and self.data[row][0] == "+":
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
                 img_media=Config.img_media, img="in.png")), u"")
-        if column == 0 and self.data[row][0] == Reports.S:
+        if column == 0 and self.data[row][0] == "-":
             return QTableWidgetItem(QIcon(u"{img_media}{img}".format(
                 img_media=Config.img_media, img="out.png")), u"")
 

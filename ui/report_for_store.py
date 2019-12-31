@@ -73,7 +73,7 @@ class ReportForStoreWidget(FWidget):
         self.setLayout(vbox)
 
     def goto_back(self):
-        from GCommon.ui.stores import StoresViewWidget
+        from ui.stores import StoresViewWidget
         self.change_main_context(StoresViewWidget, store=self.store)
 
     def goto_input(self):

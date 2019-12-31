@@ -10,10 +10,19 @@ from Common.models import (
     BaseModel, FileJoin, Owner)
 
 
-from GCommon.models import Store, Category
+class Store(BaseModel):
 
+    name = peewee.CharField(max_length=100, unique=True)
+    stock_maxi = peewee.IntegerField(default=1000, null=True)
 
-class Store(Store):
+    def __str__(self):
+        return self.display_name()
+
+    def display_name(self):
+        return u"{}/{}".format(self.name.title(), self.stock_maxi)
+
+    def goto(self):
+        return self.name
 
     def last_report(self):
         return self.get_or_none(Reports.select().where(
@@ -51,7 +60,23 @@ class Store(Store):
         return remaining, prod.number_parts_box
 
 
-class Category(Category):
+class Category(BaseModel):
+
+    name = peewee.CharField(max_length=30, unique=True)
+
+    def __str__(self):
+        return self.display_name()
+
+    def display_name(self):
+        return u"{}".format(self.name)
+
+    @classmethod
+    def get_or_create(cls, name):
+        try:
+            ctct = cls.get(name=name)
+        except cls.DoesNotExist:
+            ctct = cls.create(name=name)
+        return ctct
 
     def all_prod(self):
         return Product.select().where(Product.category == self)
@@ -144,6 +169,9 @@ class Reports(BaseModel):
                                 date=self.date.strftime('%x %Hh:%Mmm'),
                                 store=self.store,
                                 product=self.product)
+
+    def get_type(self):
+        return "-" if self.type_=="s" else '+'
 
     def display_name(self):
         return "Produit : {} >> Magasin {} \n Qtité utilisée: {} \n Date : {}".format(

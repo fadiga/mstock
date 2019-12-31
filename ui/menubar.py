@@ -10,8 +10,8 @@ from Common.ui.common import FWidget
 # from Common.ui.login import LoginWidget
 # from Common.exports import export_database_as_file
 
-from GCommon.ui.stores import StoresViewWidget
-from GCommon.ui.products import ProductsViewWidget
+from ui.stores import StoresViewWidget
+from ui.products import ProductsViewWidget
 
 from ui.invoice_view import InvoiceViewWidget
 from ui.inventory import InventoryViewWidget

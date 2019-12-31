@@ -15,7 +15,7 @@ from Common.ui.common import(FWidget, IntLineEdit, FormLabel, FormatDate, Button
 from Common.ui.util import is_int, date_to_datetime, formatted_number
 from Common.ui.table import FTableWidget
 
-from GCommon.ui._product_detail import InfoTableWidget
+from ui.product_detail import InfoTableWidget
 
 
 class StockInputWidget(QDialog, FWidget):
@@ -104,7 +104,7 @@ class StockInputWidget(QDialog, FWidget):
 
     def add_product(self):
         """ """
-        from GCommon.ui.product_edit_or_add import EditOrAddProductsDialog
+        from ui.product_edit_or_add import EditOrAddProductsDialog
 
         self.open_dialog(EditOrAddProductsDialog, modal=True,
                          product=None, table_p=self.table_resultat)

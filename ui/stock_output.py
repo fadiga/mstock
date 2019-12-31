@@ -16,7 +16,7 @@ from Common.ui.table import FTableWidget
 from peewee import fn
 
 # from ui.reports_managers import GReportViewWidget
-from GCommon.ui._product_detail import InfoTableWidget
+from ui.product_detail import InfoTableWidget
 from models import (Store, Product, Reports)
 
 

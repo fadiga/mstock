@@ -69,15 +69,17 @@ def pdFview(filename, invoice):
         ldata = []
         ldata.append(hdata)
         ht = 0
+        cp = 0
         for e, r in enumerate(items_invoice):
             montant = r.price * r.quantity
             ht += montant
+            nb_cart = len(r.description.name)
+            cp += round(nb_cart / 50)
             ldata.append([
                 formatted_number(r.quantity),
                 Paragraph('{}'.format(r.description), styleN),
                 formatted_number(r.price), formatted_number(montant)])
-
-        for i in range(e, 20):
+        for i in range(e, 20 - cp):
             ldata.append(["", "", ""])
 
         ldata.append(["", "", "Total", str(formatted_number(ht))])
@@ -103,6 +105,7 @@ def pdFview(filename, invoice):
 
         a_w = 500
         a_h = 210
+
         w, h = btable.wrap(a_w, a_h)
         btable.drawOn(p, 40, a_h)
 
