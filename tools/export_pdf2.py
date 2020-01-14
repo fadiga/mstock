@@ -35,7 +35,7 @@ def pdFview(filename, invoice):
 
     style_sheet = getSampleStyleSheet()
 
-    styleN = ParagraphStyle(style_sheet['Normal'])
+    style_n = ParagraphStyle(style_sheet['Normal'])
     # Static source pdf to be overlayed
     PDFSOURCE = 'fact_source.pdf'
     TMP_FILE = 'tmp.pdf'
@@ -52,7 +52,7 @@ def pdFview(filename, invoice):
     n_pages = input1.getNumPages()
     # Pour chaque page
 
-    y = 650
+    y = 620
     x = 40
 
     for i in range(n_pages):
@@ -74,10 +74,10 @@ def pdFview(filename, invoice):
             montant = r.price * r.quantity
             ht += montant
             nb_cart = len(r.description.name)
-            cp += round(nb_cart / 50)
+            cp += round(nb_cart / 80)
             ldata.append([
                 formatted_number(r.quantity),
-                Paragraph('{}'.format(r.description), styleN),
+                Paragraph('{}'.format(r.description), style_n),
                 formatted_number(r.price), formatted_number(montant)])
         for i in range(e, 20 - cp):
             ldata.append(["", "", ""])
@@ -104,13 +104,13 @@ def pdFview(filename, invoice):
             btable.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
 
         a_w = 500
-        a_h = 210
+        a_h = 180
 
         w, h = btable.wrap(a_w, a_h)
         btable.drawOn(p, 40, a_h)
 
         ht_en_lettre = num2words(ht, lang='fr')
-        y = 205
+        y = a_h - 15
         ht_en_lettre1, ht_en_lettre2 = controle_caratere(ht_en_lettre + " franc CFA", 55, 40)
         p.drawString(x, y - 30, "Arrêté la présente facture à la somme de : {}".format(ht_en_lettre1.title()))
         # p.drawString(x + 155, y - 30, (ht_en_lettre1.title()))
