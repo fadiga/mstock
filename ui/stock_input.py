@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
-from datetime import date
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QMessageBox, QIcon, QGridLayout, QSplitter, QLineEdit, QFrame,
                          QMenu, QComboBox, QPushButton, QDialog)
@@ -125,32 +124,35 @@ class StockInputWidget(QDialog, FWidget):
 
         for qty, name in values_t:
             product = Product.select().where(Product.name == name).get()
-
             rep = Reports(orders=None, type_=Reports.E, store=store,
-                          date=datetime_, product=product, qty_use=int(qty))
+                          product=product, qty_use=int(qty))
             try:
                 rep_p = Reports.select().where(
                     Reports.product == product, Reports.type_ == Reports.E,
                     Reports.store == store,
-                    Reports.qty_use == int(qty)).get()
-            except:
-                rep_p = False
-            if rep_p and date.today() == datetime_.date():
-                print("if duplicate_record")
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Warning)
-                msg.setWindowTitle("Alerte doublon")
-                msg.setText(
-                    "{qty} {prod} a été rentré aujourd'hui ({date}) à {time_} dans le magasin {mag}".format(
-                        date=datetime_.strftime("%d/%m/%Y"), prod=rep_p.product.name, time_=rep_p.date.strftime("%H: %M"), mag=rep_p.store, qty=rep_p.qty_use))
-                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-                if msg.exec_() == QMessageBox.Cancel:
-                    print("Pas accepter")
-                    return False
-                # if msg.exec_() == QMessageBox.YesAll:
-                #     yes_all = True
+                    Reports.qty_use == int(qty))
+                if datetime_.strftime("%Y-%m-%d") in [o.date.strftime("%Y-%m-%d") for o in rep_p]:
+                    print("if duplicate_record")
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Warning)
+                    msg.setWindowTitle("Alerte doublon")
+                    msg.setText(
+                        "{qty} {prod} a été rentré aujourd'hui ({date}) à {time_} dans le magasin {mag}".format(
+                            date=datetime_.strftime("%d/%m/%Y"), prod=rep.product.name,
+                            time_=rep.date.strftime("%H: %M"), mag=rep.store.name,
+                            qty=rep.qty_use))
+                    msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                    if msg.exec_() == QMessageBox.Cancel:
+                        print("Pas accepter")
+                        return False
+                    # if msg.exec_() == QMessageBox.YesAll:
+                    #     yes_all = True
+
+            except Exception as e:
+                print(e)
 
             try:
+                rep.date = datetime_
                 rep.save()
             except:
                 self.parent.Notify(
@@ -305,7 +307,7 @@ class InputTableWidget(FTableWidget):
                 liste_item.append(int(row_data[self.col_qtty]))
                 liste_item.append(str(row_data[self.col_dest]))
                 list_stock_input.append(liste_item)
-            except Exception as e:
+            except:
                 liste_item.append("")
 
         return list_stock_input
