@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # maintainer: Fad
 
-from datetime import date
 from PyQt4.QtGui import (QVBoxLayout, QHBoxLayout, QTableWidgetItem,
                          QMessageBox, QIcon, QGridLayout, QSplitter, QLineEdit,
                          QFrame, QPushButton, QMenu, QComboBox, QDialog)
@@ -121,31 +120,29 @@ class StockOutputWidget(QDialog, FWidget):
         for qty, name in values_t:
             product = Product.get(name=name)
             rep = Reports(type_=Reports.S, store=self.current_store,
-                          date=datetime_, product=product,
-                          qty_use=int(qty))
+                          date=datetime_, product=product, qty_use=int(qty))
             try:
                 rep_p = Reports.select().where(
                     Reports.product == product, Reports.type_ == Reports.S,
-                    Reports.store == self.current_store,
-                    Reports.qty_use == int(qty)).get()
-            except:
-                rep_p = None
+                    Reports.store == self.current_store, Reports.qty_use == int(qty))
+                if datetime_.strftime("%Y-%m-%d") in [o.date.strftime("%Y-%m-%d") for o in rep_p]:
+                    print("duplicate")
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Warning)
+                    msg.setWindowTitle("Alerte doublon")
+                    msg.setText(
+                        "{qty} {prod} a été sorti aujourd'hui à {time_} dans le magasin {mag}".format(
+                            prod=rep.product.name, time_=rep.date.strftime("%H: %M"),
+                            mag=rep.store.name, qty=rep.qty_use))
+                    msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                    if msg.exec_() == QMessageBox.Cancel:
+                        print("Pas accepter")
+                        return False
+                    # if msg.exec_() == QMessageBox.YesAll:
+                    #     yes_all = True
+            except Exception as e:
+                print(e)
 
-            if rep_p and date.today() == datetime_.date():
-                print("if duplicate_record")
-                msg = QMessageBox()
-                msg.setIcon(QMessageBox.Warning)
-                msg.setWindowTitle("Alerte doublon")
-                msg.setText(
-                    "{qty} {prod} a été sorti aujourd'hui à {time_} dans le magasin {mag}".format(
-                        prod=rep_p.product.name, time_=rep_p.date.strftime("%H: %M"), mag=rep_p.store, qty=rep_p.qty_use))
-                msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-                # print("jjj ", msg.exec_(), QMessageBox.Ok, QMessageBox.YesAll)
-                if msg.exec_() == QMessageBox.Cancel:
-                    print("Pas accepter")
-                    return False
-                # if msg.exec_() == QMessageBox.YesAll:
-                #     yes_all = True
             try:
                 rep.save()
             except:
@@ -153,7 +150,7 @@ class StockOutputWidget(QDialog, FWidget):
                     u"Ce mouvement n'a pas pu être enrgistré dans les raports",
                     "error")
                 return False
-        self.table_p.refresh_()
+        # self.table_p.refresh_()
         self.close()
         # self.parent.change_context(GReportViewWidget)
         self.parent.Notify(u"La sortie des articles avec succès", "success")
