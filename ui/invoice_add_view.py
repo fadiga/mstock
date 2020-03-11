@@ -191,7 +191,8 @@ class InvoiceAddViewWidgetDialog(QDialog, FWidget):
             item.invoices = invoice.id
             item.quantity = int(i[0])
             item.description = description
-            item.price = int(i[2])
+            item.detailed = int(i[2])
+            item.price = int(i[3])
             try:
                 item.save()
                 self.name_client.clear()
@@ -349,7 +350,7 @@ class OrderTableWidget(FTableWidget):
 
         self.parent = parent
         self.pparent = parent.parent
-        self.hheaders = [u"Quantité", u"produit vendu", u"Prix Unitaire",
+        self.hheaders = [u"Quantité", u"produit vendu", u"Détaille", u"Prix Unitaire",
                          u"Montant"]
 
         # self.setSelectionMode(QAbstractItemView.NoSelection)
@@ -366,7 +367,7 @@ class OrderTableWidget(FTableWidget):
     def refresh_(self, choix):
 
         if choix:
-            self.row = [0, u"%s" % choix.name, 0, 0]
+            self.row = [0, u"%s" % choix.name, "", 0, 0]
         else:
             return
         if not [row for row in self.data if self.row[1] in row]:
@@ -396,41 +397,43 @@ class OrderTableWidget(FTableWidget):
     def extend_rows(self):
         nb_rows = self.rowCount()
         self.setRowCount(nb_rows + 1)
-        self.setSpan(nb_rows, 0, 1, 2)
-        self.setItem(nb_rows, 2, QTableWidgetItem(u"Montant"))
+        self.setSpan(nb_rows, 0, 1, 3)
+        self.setItem(nb_rows, 3, QTableWidgetItem(u"Montant"))
         monttc = QTableWidgetItem(formatted_number(u"%d" % 0))
         monttc.setTextAlignment(Qt.AlignRight)
-        self.setItem(nb_rows, 3, monttc)
+        self.setItem(nb_rows, 4, monttc)
 
         nb_rows += 1
         self.setRowCount(nb_rows + 1)
-        self.setSpan(nb_rows, 0, 1, 3)
+        self.setSpan(nb_rows, 0, 1, 4)
         self.button = ButtonSave(u"Enregistrer")
         self.button.released.connect(self.parent.save_b)
-        self.setCellWidget(nb_rows, 3, self.button)
+        self.setCellWidget(nb_rows, 4, self.button)
 
-        pw = (self.parentWidget().width()) / 5
-        self.setColumnWidth(0, pw)
+        pw = (self.parentWidget().width()) / 8
+        # self.setColumnWidth(0, pw)
         self.setColumnWidth(1, pw * 2)
-        # self.setColumnWidth(2, pw)
+        self.setColumnWidth(2, pw * 3)
+        self.setColumnWidth(3, pw * 1.5)
         # self.setColumnWidth(3, pw)
 
     # def add_row(self):
     #     pass
 
     def _item_for_data(self, row, column, data, context=None):
-        if column != 1 and column != 3:
+        if column in [0, 2, 3]:
             self.line_edit = IntLineEdit()
             # self.line_edit.clear()
             self.line_edit.textChanged.connect(self.changed_value)
             return self.line_edit
-        return super(OrderTableWidget, self)._item_for_data(row,
-                                                            column, data,
-                                                            context)
+        return super(OrderTableWidget, self)._item_for_data(
+            row, column, data, context)
+
+    def _update_data(self, row_num, new_data):
+        self.data[row_num] = (new_data[0], new_data[1], self.data[row_num][2])
 
     def get_table_items(self):
         """ Recupère les elements du tableau """
-
         list_invoice = []
         for i in range(self.rowCount() - 1):
             liste_item = []
@@ -438,6 +441,7 @@ class OrderTableWidget(FTableWidget):
                 liste_item.append(str(self.cellWidget(i, 0).text()))
                 liste_item.append(str(self.item(i, 1).text()))
                 liste_item.append(str(self.cellWidget(i, 2).text()))
+                liste_item.append(str(self.cellWidget(i, 3).text()))
                 list_invoice.append(liste_item)
             except:
                 liste_item.append("")
@@ -447,7 +451,7 @@ class OrderTableWidget(FTableWidget):
     def changed_value(self, refresh=False):
         """ Calcule les Resultat """
         mtt_ht = 0
-        for row_num in xrange(0, self.data.__len__()):
+        for row_num in range(0, self.data.__len__()):
             last_report = Product.filter(name=str(self.item(row_num, 1)
                                                   .text())).get().last_report
             try:
@@ -456,7 +460,8 @@ class OrderTableWidget(FTableWidget):
                 qtremaining = 0
 
             qtsaisi = is_int(self.cellWidget(row_num, 0).text())
-            pu = is_int(self.cellWidget(row_num, 2).text())
+            detaille = is_int(self.cellWidget(row_num, 2).text())
+            pu = is_int(self.cellWidget(row_num, 3).text())
 
             self.isvalid = True
             viderreur_qtsaisi = ""
@@ -473,7 +478,7 @@ class OrderTableWidget(FTableWidget):
                 self.isvalid = False
 
             self.cellWidget(row_num, 0).setStyleSheet(viderreur_qtsaisi)
-            self.cellWidget(row_num, 2).setStyleSheet(viderreur_pu)
+            self.cellWidget(row_num, 3).setStyleSheet(viderreur_pu)
 
             self.cellWidget(row_num, 0).setToolTip("")
             if qtremaining < qtsaisi:
@@ -484,12 +489,12 @@ class OrderTableWidget(FTableWidget):
                     u"%s est > %s (stock remaining)" % (qtsaisi, qtremaining))
                 # self.isvalid = False
                 # return False
-
             ui_item = (qtsaisi * pu)
             mtt_ht += ui_item
             montt = QTableWidgetItem(formatted_number(ui_item))
             montt.setTextAlignment(Qt.AlignRight)
-            self.setItem(row_num, 3, montt)
+            self._update_data(row_num, [qtsaisi, detaille, pu, mtt_ht])
+            self.setItem(row_num, 4, montt)
         monttc = QTableWidgetItem(formatted_number(mtt_ht))
         monttc.setTextAlignment(Qt.AlignRight)
-        self.setItem(row_num + 1, 3, monttc)
+        self.setItem(row_num + 1, 4, monttc)

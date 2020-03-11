@@ -17,6 +17,7 @@ from ui.mainwindow import MainWindow
 from Common.ui.window import FWindow
 from Common.ui.qss import theme
 from Common.cmain import cmain
+from migrations import make_migrate
 
 
 app = QApplication(sys.argv)
@@ -33,4 +34,5 @@ def main():
 
 if __name__ == '__main__':
     if cmain():
+        make_migrate()
         main()

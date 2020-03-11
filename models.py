@@ -343,6 +343,7 @@ class InvoiceItem(BaseModel):
     """ Represents an element of an order such as a product
     """
     description = peewee.ForeignKeyField(Product, verbose_name=("Description"))
+    detailed = peewee.CharField()
     quantity = peewee.IntegerField(verbose_name=("Quantite"))
     price = peewee.IntegerField(verbose_name=("Prix"))
     invoices = peewee.ForeignKeyField(Invoice)
